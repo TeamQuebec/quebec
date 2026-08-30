@@ -154,6 +154,14 @@
     background-size: 44px 44px;
   }
 
+  /* Same grid, tuned for dark hero sections (white lines, low opacity) */
+  .bg-grid-light {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, #ffffff 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, #ffffff 6%, transparent) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
