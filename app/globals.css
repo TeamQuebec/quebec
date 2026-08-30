@@ -1,0 +1,228 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Raw design tokens — emitted as real CSS variables on :root so they can be
+ * referenced with var(--background), var(--radius), etc.
+ */
+:root {
+  --background: #f4f8fc;
+  --foreground: #10233a;
+  --card: #ffffff;
+  --card-foreground: #10233a;
+  --popover: #ffffff;
+  --popover-foreground: #10233a;
+  --primary: #284768;
+  --primary-foreground: #ffffff;
+  --secondary: #e9f1f8;
+  --secondary-foreground: #1a2f47;
+  --muted: #eef3f8;
+  --muted-foreground: #5c6f84;
+  --accent: #e3f3f1;
+  --accent-foreground: #0e4c4c;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e1e9f1;
+  --input: #cfdce8;
+  --ring: #2d537e;
+  --radius: 0.6rem;
+}
+
+/*
+ * Theme mapping — utilities (bg-background, text-foreground, rounded-xl, …)
+ * inline these values; the raw tokens above are the source of truth.
+ */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-space), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", "Cascadia Code", monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Quebec brand scale: deep trust navy -> blue (literal values, no var refs) */
+  --color-brand-50: #f3f8fc;
+  --color-brand-100: #e4eef7;
+  --color-brand-200: #c9dcee;
+  --color-brand-300: #a0c2e0;
+  --color-brand-400: #6f9fcc;
+  --color-brand-500: #4c82b8;
+  --color-brand-600: #38699b;
+  --color-brand-700: #2d537e;
+  --color-brand-800: #284768;
+  --color-brand-900: #1a2f47;
+  --color-brand-950: #0d1d2e;
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.4s ease-out both;
+  --animate-scale-in: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 1.8s linear infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: -200% 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Never let the page scroll sideways; inner scroll areas still work. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, #4c82b8 25%, transparent);
+  }
+}
+
+@layer utilities {
+  /* Subtle blueprint grid used on hero / trust sections */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, #1a2f47 5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, #1a2f47 5%, transparent) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-print {
+    @media print {
+      display: none !important;
+    }
+  }
+
+  .print-area {
+    @media print {
+      box-shadow: none !important;
+      border-color: #000 !important;
+    }
+  }
+
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+}
+
+@layer components {
+  /* Dotted "tear" line used on the receipt — like a ticket stub */
+  .tear-line {
+    background-image: radial-gradient(circle, var(--border) 1.5px, transparent 1.5px);
+    background-size: 14px 3px;
+    background-repeat: repeat-x;
+    background-position: center;
+    height: 3px;
+  }
+
+  /* Mono "reference plate" */
+  .ref-plate {
+    font-family: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
+    letter-spacing: 0.08em;
+  }
+
+  /* Sweeping scan line shown while the verifier "reads" a reference */
+  .scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #2dd4bf, transparent);
+    animation: qbc-scan 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  @keyframes qbc-scan {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    12% {
+      opacity: 1;
+    }
+    88% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(76px);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scan-line {
+      animation: none;
+      opacity: 0;
+    }
+  }
+}
