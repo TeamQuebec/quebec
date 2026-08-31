@@ -60,21 +60,22 @@ export function BusinessUsersTable() {
       verificationsByIdentity.set(v.identityId, list);
     }
 
-    const list = store.grants
-      .filter((g) => g.businessId === businessId)
-      .map((grant) => {
-        const identity = byIdentity.get(grant.identityId);
-        if (!identity) return null;
-        const vs = verificationsByIdentity.get(grant.identityId) ?? [];
-        vs.sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
-        return {
-          grant,
-          identity,
-          lastVerifiedAt: vs[0]?.requestedAt ?? null,
-          verificationCount: vs.length,
-        };
-      })
-      .filter((r): r is Row => r !== null);
+    // Build rows explicitly — no nulls can reach the array, so `Row[]` always holds.
+    const list: Row[] = [];
+    for (const grant of store.grants) {
+      if (grant.businessId !== businessId) continue;
+      const identity = byIdentity.get(grant.identityId);
+      if (!identity) continue;
+      const vs = [...(verificationsByIdentity.get(grant.identityId) ?? [])].sort((a, b) =>
+        b.requestedAt.localeCompare(a.requestedAt)
+      );
+      list.push({
+        grant,
+        identity,
+        lastVerifiedAt: vs[0]?.requestedAt ?? null,
+        verificationCount: vs.length,
+      });
+    }
 
     return list.sort(
       (a, b) =>
