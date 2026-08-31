@@ -6,14 +6,14 @@ export function LogoMark({ className }: { className?: string }) {
     <svg viewBox="0 0 32 32" className={cn("h-8 w-8", className)} aria-hidden="true">
       <defs>
         <linearGradient id="qbc-logo-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#2d537e" />
-          <stop offset="1" stopColor="#0d9488" />
+          <stop offset="0" stopColor="#3f423c" />
+          <stop offset="1" stopColor="#171717" />
         </linearGradient>
       </defs>
       <rect width="32" height="32" rx="9" fill="url(#qbc-logo-g)" />
       <path
         d="M9.5 16.5l4.2 4.2 8.8-9.4"
-        stroke="#fff"
+        stroke="#f4c542"
         strokeWidth="3.2"
         fill="none"
         strokeLinecap="round"

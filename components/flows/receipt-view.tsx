@@ -23,13 +23,13 @@ import { cn } from "@/lib/utils";
 import type { CheckResult, Verification } from "@/lib/types";
 
 const ANSWER_STYLE: Record<CheckResult["answer"], { label: string; cls: string }> = {
-  yes: { label: "YES", cls: "border-emerald-200 bg-emerald-50 text-emerald-700" },
+  yes: { label: "YES", cls: "border-gold-border bg-gold-soft text-gold-deep" },
   no: { label: "NO", cls: "border-rose-200 bg-rose-50 text-rose-700" },
   unable: { label: "UNABLE", cls: "border-amber-200 bg-amber-50 text-amber-700" },
 };
 
 const VERDICT_BAR: Record<string, { cls: string; icon: typeof ShieldCheck }> = {
-  yes: { cls: "border-emerald-200 bg-emerald-50 text-emerald-700", icon: BadgeCheck },
+  yes: { cls: "border-gold-border bg-gold-soft text-gold-deep", icon: BadgeCheck },
   no: { cls: "border-rose-200 bg-rose-50 text-rose-700", icon: XCircle },
   revoked: { cls: "border-amber-200 bg-amber-50 text-amber-700", icon: Lock },
   pending: { cls: "border-amber-200 bg-amber-50 text-amber-700", icon: Lock },
@@ -61,7 +61,7 @@ export function ReceiptView({
     <div className="mx-auto w-full max-w-2xl">
       <div className="print-area animate-fade-up overflow-hidden rounded-2xl border border-border bg-white shadow-xl shadow-brand-900/10">
         {/* Header band */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-brand-900 via-brand-800 to-teal-900 px-6 py-5 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-brand-900 via-brand-800 to-brand-950 px-6 py-5 sm:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <LogoMark className="h-9 w-9 shrink-0 bg-white/10 ring-1 ring-white/20" />
             <div>
@@ -175,7 +175,7 @@ export function ReceiptView({
 
           {/* Data never shown */}
           <div className="mt-6 flex items-center gap-2 rounded-lg bg-brand-50 px-4 py-2.5">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-teal-600" />
+            <ShieldCheck className="h-4 w-4 shrink-0 text-gold-strong" />
             <p className="text-xs text-brand-800">
               This receipt contains <span className="font-semibold">no personal data</span> — only
               the facts requested and the answers given.
@@ -188,7 +188,7 @@ export function ReceiptView({
           <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1.5 text-xs font-semibold text-brand-950">
-                <Lock className="h-3.5 w-3.5 text-teal-600" />
+                <Lock className="h-3.5 w-3.5 text-gold-strong" />
                 Tamper-evident record hash
               </p>
               <p className="ref-plate mt-1.5 break-all text-[11px] leading-relaxed text-muted-foreground">
@@ -197,7 +197,7 @@ export function ReceiptView({
               <button
                 type="button"
                 onClick={copyHash}
-                className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-teal-700 hover:underline"
+                className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-gold-strong hover:underline"
               >
                 <Copy className="h-3 w-3" />
                 Copy hash

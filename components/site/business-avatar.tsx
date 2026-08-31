@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
 const PALETTE = [
-  "bg-teal-50 text-teal-700 ring-teal-100",
+  "bg-gold-soft text-gold-strong ring-gold-border",
   "bg-brand-50 text-brand-700 ring-brand-100",
-  "bg-emerald-50 text-emerald-700 ring-emerald-100",
+  "bg-gold-soft text-gold-strong ring-gold-border",
   "bg-violet-50 text-violet-700 ring-violet-100",
   "bg-amber-50 text-amber-700 ring-amber-100",
   "bg-rose-50 text-rose-700 ring-rose-100",

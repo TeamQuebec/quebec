@@ -74,10 +74,10 @@ export function verdictMeta(v: Verification): VerdictMeta {
 
 const ACCENT_STYLES = {
   yes: {
-    ring: "bg-emerald-50 ring-emerald-100/70",
-    icon: "text-emerald-600",
-    text: "text-emerald-600",
-    banner: "from-emerald-50/70 to-white border-emerald-100",
+    ring: "bg-gold-soft ring-gold-border/70",
+    icon: "text-gold-strong",
+    text: "text-gold-strong",
+    banner: "from-gold-soft/70 to-white border-gold-border",
   },
   no: {
     ring: "bg-rose-50 ring-rose-100/70",
@@ -101,7 +101,7 @@ const ACCENT_STYLES = {
 
 /** Per-fact answer chips shown under the verdict. */
 const CHECK_ANSWER: Record<CheckResult["answer"], { label: string; cls: string }> = {
-  yes: { label: "YES", cls: "border-emerald-200 bg-emerald-50 text-emerald-700" },
+  yes: { label: "YES", cls: "border-gold-border bg-gold-soft text-gold-deep" },
   no: { label: "NO", cls: "border-rose-200 bg-rose-50 text-rose-700" },
   unable: { label: "UNABLE", cls: "border-amber-200 bg-amber-50 text-amber-700" },
 };
@@ -203,7 +203,7 @@ export function VerdictDisplay({
 
         <div className="flex flex-col gap-2.5 border-t border-brand-100 bg-white/70 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-teal-600" />
+            <ShieldCheck className="h-4 w-4 text-gold-strong" />
             No name, DOB or NIN was shown to {businessName}.
           </p>
           <div className="flex gap-2.5">

@@ -19,7 +19,10 @@ function useNavLinks(): NavLink[] {
   const mode = modeFromPath(pathname);
   const links: NavLink[] = [];
   if (mode === "user") links.push({ label: "My dashboard", href: "/user/dashboard" });
-  if (mode === "business") links.push({ label: "Verify a reference", href: "/business/verify" });
+  if (mode === "business") {
+    links.push({ label: "Business dashboard", href: "/business/dashboard" });
+    links.push({ label: "Verify a reference", href: "/business/verify" });
+  }
   links.push({ label: "How it works", href: "/how-it-works" });
   return links;
 }
@@ -42,7 +45,7 @@ function NavLinks({ links, pathname }: { links: NavLink[]; pathname: string }) {
           >
             {l.label}
             {active && (
-              <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-teal-600" />
+              <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-gold" />
             )}
           </Link>
         );
@@ -63,7 +66,7 @@ export function TopNav() {
           <Logo />
           {mode && (
             <span className="hidden items-center gap-1.5 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-medium text-brand-800 sm:inline-flex">
-              <ShieldCheck className="h-3.5 w-3.5 text-teal-600" />
+              <ShieldCheck className="h-3.5 w-3.5 text-gold-strong" />
               {mode === "user" ? "User portal" : "Business portal"}
             </span>
           )}

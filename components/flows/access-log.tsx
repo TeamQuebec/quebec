@@ -15,14 +15,14 @@ import { useApp } from "@/state/app-context";
 import { timeAgo } from "@/lib/format";
 import type { LogType } from "@/lib/types";
 
-const TYPE_STYLE: Record<
+export const TYPE_STYLE: Record<
   LogType,
   { icon: typeof ShieldCheck; classes: string }
 > = {
-  check: { icon: ShieldCheck, classes: "bg-teal-50 text-teal-600" },
+  check: { icon: ShieldCheck, classes: "bg-gold-soft text-gold-strong" },
   grant: { icon: KeyRound, classes: "bg-brand-50 text-brand-600" },
   revoke: { icon: Ban, classes: "bg-rose-50 text-rose-600" },
-  approve: { icon: Check, classes: "bg-emerald-50 text-emerald-600" },
+  approve: { icon: Check, classes: "bg-gold-soft text-gold-strong" },
   deny: { icon: X, classes: "bg-muted text-muted-foreground" },
   enroll: { icon: UserPlus, classes: "bg-violet-50 text-violet-600" },
 };
@@ -67,7 +67,7 @@ export function AccessLog() {
               {entry.verificationId && (
                 <Link
                   href={`/receipt/${entry.verificationId}`}
-                  className="inline-flex shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-teal-700 hover:bg-teal-50"
+                  className="inline-flex shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-gold-strong hover:bg-gold-soft"
                 >
                   Receipt
                   <ChevronRight className="h-3.5 w-3.5" />

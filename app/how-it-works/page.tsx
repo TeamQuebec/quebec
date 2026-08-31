@@ -97,14 +97,14 @@ export default function HowItWorksPage() {
       {/* Hero */}
       <section className="bg-grid border-b border-border">
         <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-20">
-          <Badge className="gap-1.5 border-teal-200 bg-teal-50 text-teal-800">
+          <Badge className="gap-1.5 border-gold-border bg-gold-soft text-gold-deep">
             <ShieldCheck className="h-3.5 w-3.5" />
             How Quebec works
           </Badge>
           <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight text-brand-950 sm:text-5xl">
             Trust the answer.
             <br />
-            <span className="bg-gradient-to-r from-brand-600 to-teal-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-600 to-gold bg-clip-text text-transparent">
               Not the file.
             </span>
           </h1>
@@ -131,7 +131,7 @@ export default function HowItWorksPage() {
               <div className="flex h-full flex-col rounded-2xl border border-border bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between">
                   <span className="font-display text-3xl font-bold text-brand-200">{s.n}</span>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-50 text-teal-700">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold-soft text-gold-strong">
                     <s.icon className="h-5 w-5" />
                   </span>
                 </div>
@@ -153,7 +153,7 @@ export default function HowItWorksPage() {
       <section className="border-y border-border bg-white">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-strong">
               For the business
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-brand-950">
@@ -196,7 +196,7 @@ export default function HowItWorksPage() {
       {/* What stops a fake YES */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-strong">
             Security model
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-brand-950">
@@ -223,7 +223,7 @@ export default function HowItWorksPage() {
             },
           ].map((f) => (
             <div key={f.title} className="rounded-xl border border-border bg-white p-6 shadow-sm">
-              <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-teal-50 text-teal-700">
+              <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-gold-soft text-gold-strong">
                 <f.icon className="h-5 w-5" />
               </span>
               <h3 className="mt-4 font-semibold leading-snug text-brand-950">{f.title}</h3>
@@ -237,7 +237,7 @@ export default function HowItWorksPage() {
       <section className="border-t border-border bg-white">
         <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
           <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-strong">
               See the difference
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-brand-950">
@@ -259,7 +259,7 @@ export default function HowItWorksPage() {
                     </span>
                   </th>
                   <th className="px-4 py-3.5 sm:px-5">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-teal-700">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold-strong">
                       <QrCode className="h-4 w-4" />
                       With Quebec
                     </span>
@@ -278,7 +278,7 @@ export default function HowItWorksPage() {
                     </td>
                     <td className="px-4 py-3.5 sm:px-5">
                       <span className="flex items-start gap-2">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
                         {row.withQuebec}
                       </span>
                     </td>
@@ -292,7 +292,7 @@ export default function HowItWorksPage() {
 
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 via-brand-800 to-teal-900 px-6 py-12 text-center shadow-xl sm:px-12">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 via-brand-800 to-brand-950 px-6 py-12 text-center shadow-xl sm:px-12">
           <div className="bg-grid absolute inset-0 opacity-20" />
           <div className="relative">
             <h2 className="font-display text-3xl font-bold tracking-tight text-white">
@@ -314,7 +314,7 @@ export default function HowItWorksPage() {
                 className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white"
                 asChild
               >
-                <Link href="/business/verify">
+                <Link href="/business/dashboard">
                   <Building2 className="h-4 w-4" />
                   I&apos;m a business
                 </Link>
@@ -325,7 +325,7 @@ export default function HowItWorksPage() {
       </section>
 
       <p className="mx-auto -mt-8 mb-16 flex max-w-xl items-center justify-center gap-1.5 px-4 text-center text-xs text-muted-foreground">
-        <KeyRound className="h-3.5 w-3.5 text-teal-600" />
+        <KeyRound className="h-3.5 w-3.5 text-gold-strong" />
         In this demo the “signature” is a deterministic hash. Phase 2 wires in real signing and
         verification against the backend.
       </p>

@@ -58,7 +58,8 @@ function freshSeed(): Store {
   grants.push(
     { id: "grant_demo_safebank", identityId: d, businessId: "biz_safebank", status: "granted", scopes: ["over_18"], requestedAt: daysAgo(6), grantedAt: daysAgo(6) },
     { id: "grant_demo_smiletrust", identityId: d, businessId: "biz_smiletrust", status: "granted", scopes: ["name_matches"], requestedAt: daysAgo(3), grantedAt: daysAgo(3) },
-    { id: "grant_demo_paycycle", identityId: d, businessId: "biz_paycycle", status: "requested", scopes: ["nin_matches"], requestedAt: minutesAgo(5 * 60) }
+    { id: "grant_demo_paycycle", identityId: d, businessId: "biz_paycycle", status: "requested", scopes: ["nin_matches"], requestedAt: minutesAgo(5 * 60) },
+    { id: "grant_demo_quickmart", identityId: d, businessId: "biz_quickmart", status: "revoked", scopes: ["over_18", "name_matches"], requestedAt: daysAgo(14), grantedAt: daysAgo(14), revokedAt: daysAgo(2) }
   );
 
   const mkVerification = (over: {
@@ -118,6 +119,8 @@ function freshSeed(): Store {
   log({ identityId: d, businessId: "biz_safebank", type: "check", message: "SafeBank NG verified Is over 18?", at: daysAgo(2), verificationId: vfy1.id });
   log({ identityId: d, businessId: "biz_smiletrust", type: "grant", message: "SmileTrust was granted access.", at: daysAgo(3) });
   log({ identityId: d, businessId: "biz_safebank", type: "grant", message: "SafeBank NG was granted access.", at: daysAgo(6) });
+  log({ identityId: d, businessId: "biz_quickmart", type: "grant", message: "QuickMart was granted access.", at: daysAgo(14) });
+  log({ identityId: d, businessId: "biz_quickmart", type: "revoke", message: "You revoked QuickMart's access.", at: daysAgo(2) });
 
   // ---- Deterministically populate the rest of the dataset ----
   const rng = mulberry32(20260830);
@@ -169,6 +172,69 @@ function freshSeed(): Store {
       }
     }
   }
+
+  // ---- Business portal demo: give the signed-in business a realistic roster ----
+  const safebankUsers = identities.filter((i) => i.id !== d).slice(0, 10);
+  safebankUsers.forEach((identity, idx) => {
+    const scopes: CheckId[] =
+      idx % 2 === 0 ? ["over_18", "has_verified_identity"] : ["over_18", "name_matches"];
+    const requestedAt = daysAgo(20 - idx * 2);
+
+    if (idx < 6) {
+      // granted — each with 1-2 checks on record
+      const grantedAt = daysAgo(19 - idx * 2);
+      grants.push({
+        id: generateInternalId("grant"),
+        identityId: identity.id,
+        businessId: "biz_safebank",
+        status: "granted",
+        scopes,
+        requestedAt,
+        grantedAt,
+      });
+      log({ identityId: identity.id, businessId: "biz_safebank", type: "grant", message: "SafeBank NG was granted access.", at: grantedAt });
+      const vfyCount = idx % 2 === 0 ? 2 : 1;
+      for (let k = 0; k < vfyCount; k++) {
+        const answers = computeAnswers(identity, scopes);
+        const verdict = verdictOf(answers);
+        const vfy = mkVerification({
+          identity,
+          businessId: "biz_safebank",
+          checks: answers,
+          verdict,
+          requestedAt: daysAgo(Math.max(0, 17 - idx * 2 - k * 3)),
+          note: verdictNote(verdict),
+        });
+        log({ identityId: identity.id, businessId: "biz_safebank", type: "check", message: `SafeBank NG verified ${scopeSummary(scopes)}?`, at: vfy.requestedAt, verificationId: vfy.id });
+      }
+    } else if (idx < 8) {
+      // pending request from the business
+      grants.push({
+        id: generateInternalId("grant"),
+        identityId: identity.id,
+        businessId: "biz_safebank",
+        status: "requested",
+        scopes,
+        requestedAt,
+      });
+      log({ identityId: identity.id, businessId: "biz_safebank", type: "grant", message: `SafeBank NG requested access to verify ${scopeSummary(scopes).toLowerCase()}.`, at: requestedAt });
+    } else {
+      // holder revoked the business's access
+      const grantedAt = daysAgo(9);
+      grants.push({
+        id: generateInternalId("grant"),
+        identityId: identity.id,
+        businessId: "biz_safebank",
+        status: "revoked",
+        scopes,
+        requestedAt,
+        grantedAt,
+        revokedAt: daysAgo(1),
+      });
+      log({ identityId: identity.id, businessId: "biz_safebank", type: "grant", message: "SafeBank NG was granted access.", at: grantedAt });
+      log({ identityId: identity.id, businessId: "biz_safebank", type: "revoke", message: "You revoked SafeBank NG's access.", at: daysAgo(1) });
+    }
+  });
 
   return {
     identities,

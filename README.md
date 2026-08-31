@@ -83,11 +83,17 @@ async signatures the future backend needs (`enrollIdentityApi`,
 
 ## Screens
 
-| Route               | Purpose                                          |
-| ------------------- | ------------------------------------------------ |
-| `/`                 | Landing — two entry points (user / business)     |
-| `/user/enroll`      | Enrollment form → generated reference            |
-| `/user/dashboard`   | Reference, access list (revoke/approve), log     |
-| `/business/verify`  | Verifier portal — reference + checks → verdict   |
-| `/receipt/[ref]`    | Tamper-evident proof-of-check receipt            |
-| `/how-it-works`     | Plain-language trust page (judging criterion)    |
+| Route                   | Purpose                                          |
+| ----------------------- | ------------------------------------------------ |
+| `/`                     | Landing — two entry points (user / business)     |
+| `/user/enroll`          | Enrollment form → generated reference            |
+| `/user/dashboard`       | Overview — KPIs, 7-day chart, recent activity    |
+| `/user/third-parties`   | Access list (revoke/approve/restore)             |
+| `/user/activity`        | Read-only access log timeline                    |
+| `/user/profile`         | Identity record (masked NIN, DOB, status)        |
+| `/business/dashboard`   | Overview — KPIs, 7-day chart, recent checks      |
+| `/business/users`       | Business roster + verification counts            |
+| `/business/history`     | All signed checks, each linked to its receipt    |
+| `/business/verify`      | Verifier portal — reference + checks → verdict   |
+| `/receipt/[ref]`        | Tamper-evident proof-of-check receipt            |
+| `/how-it-works`         | Plain-language trust page (judging criterion)    |

@@ -58,7 +58,7 @@ function FlowStep({ n, title, active, done }: { n: string; title: string; active
         className={cn(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
           done
-            ? "border-teal-600 bg-teal-600 text-white"
+            ? "border-gold bg-gold text-af-ink"
             : active
               ? "border-brand-800 bg-brand-800 text-white"
               : "border-brand-200 bg-white text-brand-400"
@@ -159,11 +159,11 @@ export function EnrollForm() {
     return (
       <div className="animate-fade-up">
         <Card className="overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-brand-700 via-teal-600 to-teal-500" />
+          <div className="h-1.5 bg-gradient-to-r from-brand-700 via-gold to-gold" />
           <CardContent className="p-8 sm:p-10">
             <div className="flex flex-col items-center text-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-50 ring-8 ring-teal-50/50">
-                <PartyPopper className="h-7 w-7 text-teal-600" />
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-soft ring-8 ring-gold-soft/50">
+                <PartyPopper className="h-7 w-7 text-gold-strong" />
               </span>
               <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-brand-950">
                 Your identity reference is ready
@@ -236,7 +236,7 @@ export function EnrollForm() {
       </div>
 
       <Card className="overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-brand-700 to-teal-600" />
+        <div className="h-1.5 bg-gradient-to-r from-brand-700 to-gold" />
         <CardContent className="p-6 sm:p-8">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -249,7 +249,7 @@ export function EnrollForm() {
               </p>
             </div>
             <Button type="button" variant="ghost" size="sm" className="shrink-0" onClick={fillDemo}>
-              <Sparkles className="h-4 w-4 text-teal-600" />
+              <Sparkles className="h-4 w-4 text-gold-strong" />
               Try a demo identity
             </Button>
           </div>
@@ -274,11 +274,11 @@ export function EnrollForm() {
                     "pr-10",
                     errName
                       ? "border-rose-400 focus-visible:ring-rose-400/40"
-                      : touched.name && name && "border-emerald-300"
+                      : touched.name && name && "border-gold-strong"
                   )}
                 />
                 {!errName && touched.name && name && (
-                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />
+                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gold-strong" />
                 )}
               </div>
               {errName ? (
@@ -307,13 +307,13 @@ export function EnrollForm() {
                 className={cn(
                   errDob
                     ? "border-rose-400 focus-visible:ring-rose-400/40"
-                    : touched.dob && dob && "border-emerald-300"
+                    : touched.dob && dob && "border-gold-strong"
                 )}
               />
               {errDob ? (
                 <p className="text-xs text-rose-600">{errDob}</p>
               ) : touched.dob && dob ? (
-                <p className="flex items-center gap-1 text-xs text-emerald-600">
+                <p className="flex items-center gap-1 text-xs text-gold-strong">
                   <Check className="h-3 w-3" />
                   Looks good
                 </p>
@@ -340,11 +340,11 @@ export function EnrollForm() {
                     "ref-plate pr-10",
                     errNin
                       ? "border-rose-400 focus-visible:ring-rose-400/40"
-                      : touched.nin && nin.replace(/\D/g, "").length === 11 && "border-emerald-300"
+                      : touched.nin && nin.replace(/\D/g, "").length === 11 && "border-gold-strong"
                   )}
                 />
                 {!errNin && touched.nin && nin.replace(/\D/g, "").length === 11 && (
-                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />
+                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gold-strong" />
                 )}
               </div>
               {errNin ? (
@@ -358,8 +358,8 @@ export function EnrollForm() {
             </div>
 
             {/* What happens to this data next */}
-            <div className="flex items-start gap-2.5 rounded-lg border border-teal-100 bg-teal-50/50 px-3.5 py-3">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" />
+            <div className="flex items-start gap-2.5 rounded-lg border border-gold-border bg-gold-soft/50 px-3.5 py-3">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold-strong" />
               <p className="text-xs leading-relaxed text-brand-800">
                 Your details are stored <span className="font-semibold">encrypted</span> and are
                 never shown raw to verifiers — they only ever receive the signed YES / NO answer

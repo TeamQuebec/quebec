@@ -15,7 +15,7 @@ export function modeFromPath(pathname: string): PortalMode {
 
 const ITEMS: { mode: Exclude<PortalMode, null>; href: string; label: string; icon: typeof UserRound }[] = [
   { mode: "user", href: "/user/dashboard", label: "User", icon: UserRound },
-  { mode: "business", href: "/business/verify", label: "Business", icon: Building2 },
+  { mode: "business", href: "/business/dashboard", label: "Business", icon: Building2 },
 ];
 
 export function ModeSwitch({ className }: { className?: string }) {

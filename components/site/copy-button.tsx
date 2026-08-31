@@ -53,7 +53,7 @@ export function CopyButton({
       className={cn("gap-1.5", className)}
     >
       {copied ? (
-        <Check className="h-3.5 w-3.5 text-emerald-600" />
+        <Check className="h-3.5 w-3.5 text-gold-strong" />
       ) : (
         <Copy className="h-3.5 w-3.5" />
       )}

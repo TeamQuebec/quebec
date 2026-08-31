@@ -38,7 +38,7 @@ function StepBadge({ n, active, done, label }: { n: string; active: boolean; don
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors",
           done
-            ? "bg-teal-600 text-white"
+            ? "bg-gold text-af-ink"
             : active
               ? "bg-brand-800 text-white"
               : "border border-brand-200 bg-white text-brand-400"
@@ -55,7 +55,7 @@ function StepBadge({ n, active, done, label }: { n: string; active: boolean; don
 
 /** Answer chips shown as each check completes during the verification sequence. */
 const ANSWER_CHIP: Record<CheckAnswer, { label: string; cls: string }> = {
-  yes: { label: "YES", cls: "border-emerald-200 bg-emerald-50 text-emerald-700" },
+  yes: { label: "YES", cls: "border-gold-border bg-gold-soft text-gold-deep" },
   no: { label: "NO", cls: "border-rose-200 bg-rose-50 text-rose-700" },
   unable: { label: "UNABLE", cls: "border-amber-200 bg-amber-50 text-amber-700" },
 };
@@ -102,7 +102,7 @@ function VerificationSequence({
 
   return (
     <div className="animate-fade-in overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-      <div className="h-1.5 bg-gradient-to-r from-brand-700 to-teal-600" />
+      <div className="h-1.5 bg-gradient-to-r from-brand-700 to-gold" />
       <div className="p-6 sm:p-8">
         {/* Reference scan plate */}
         <div className="relative h-24 overflow-hidden rounded-xl border border-brand-200 bg-brand-950 px-4">
@@ -139,7 +139,7 @@ function VerificationSequence({
                     {ANSWER_CHIP[answer].label}
                   </Badge>
                 ) : isDone ? (
-                  <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-teal-600">
+                  <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-gold-strong">
                     <Check className="h-4 w-4" />
                     Done
                   </span>
@@ -157,7 +157,7 @@ function VerificationSequence({
         </div>
 
         <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-          <Lock className="h-3.5 w-3.5 shrink-0 text-teal-600" />
+          <Lock className="h-3.5 w-3.5 shrink-0 text-gold-strong" />
           Only these facts are answered — nothing else from the record is touched.
         </p>
       </div>
@@ -255,7 +255,7 @@ export function VerifyConsole() {
         />
       ) : (
         <Card className="overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-brand-700 to-teal-600" />
+          <div className="h-1.5 bg-gradient-to-r from-brand-700 to-gold" />
           <CardContent className="p-6 sm:p-8">
             {/* Step 1 — reference */}
             <label htmlFor="qbc-ref" className="block">
@@ -293,7 +293,7 @@ export function VerifyConsole() {
                   onClick={() => setReference(c.ref)}
                   className={cn(
                     "ref-plate inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors",
-                    c.tone === "yes" && "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
+                    c.tone === "yes" && "border-gold-border bg-gold-soft text-gold-deep hover:border-gold-strong/40",
                     c.tone === "no" && "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
                     c.tone === "none" && "border-brand-200 bg-white text-brand-600 hover:bg-brand-50"
                   )}
@@ -323,7 +323,7 @@ export function VerifyConsole() {
                       className={cn(
                         "flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-all",
                         checked
-                          ? "border-teal-300 bg-teal-50/50 shadow-sm"
+                          ? "border-gold bg-gold-soft/60 shadow-sm"
                           : "border-border bg-white hover:border-brand-200 hover:bg-brand-50/40"
                       )}
                     >
@@ -376,9 +376,9 @@ export function VerifyConsole() {
       )}
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-        <Sparkles className="h-3.5 w-3.5 text-teal-600" />
+        <Sparkles className="h-3.5 w-3.5 text-gold-strong" />
         Why trust the answer? Every result is signed, timestamped and re-checkable on the receipt.
-        <Link href="/how-it-works" className="font-medium text-teal-700 hover:underline">
+        <Link href="/how-it-works" className="font-medium text-gold-strong hover:underline">
           See how it works
         </Link>
       </p>

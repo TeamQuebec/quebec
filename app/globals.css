@@ -6,26 +6,46 @@
  * referenced with var(--background), var(--radius), etc.
  */
 :root {
-  --background: #f4f8fc;
-  --foreground: #10233a;
+  --background: #f7f7f2;
+  --foreground: #171717;
   --card: #ffffff;
-  --card-foreground: #10233a;
+  --card-foreground: #171717;
   --popover: #ffffff;
-  --popover-foreground: #10233a;
-  --primary: #284768;
+  --popover-foreground: #171717;
+  --primary: #171717;
   --primary-foreground: #ffffff;
-  --secondary: #e9f1f8;
-  --secondary-foreground: #1a2f47;
-  --muted: #eef3f8;
-  --muted-foreground: #5c6f84;
-  --accent: #e3f3f1;
-  --accent-foreground: #0e4c4c;
+  --secondary: #f0f1ec;
+  --secondary-foreground: #171717;
+  --muted: #f0f1ec;
+  --muted-foreground: #626560;
+  --accent: #fff4c7;
+  --accent-foreground: #171717;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: #e1e9f1;
-  --input: #cfdce8;
-  --ring: #2d537e;
+  --border: #dcddd8;
+  --input: #cfd1c9;
+  --ring: #dcc76a;
   --radius: 0.6rem;
+}
+
+/*
+ * Quebec landing tokens — used only by the landing page (af-* utilities).
+ * Warm off-white ground, near-black ink, subtle gray borders, and a single
+ * yellow/gold signature accent used sparingly.
+ */
+:root {
+  --af-bg: #f7f7f2;
+  --af-surface: #ffffff;
+  --af-surface-muted: #f1f1ea;
+  --af-ink: #171717;
+  --af-muted: #626560;
+  --af-muted-2: #8b8f86;
+  --af-border: #dcddd8;
+  --af-border-strong: #c6c8c1;
+  --af-accent: #f4c542;
+  --af-accent-soft: #fff4c7;
+  --af-dark: #171717;
+  --af-dark-muted: #23231f;
 }
 
 /*
@@ -62,18 +82,39 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* Quebec brand scale: deep trust navy -> blue (literal values, no var refs) */
-  --color-brand-50: #f3f8fc;
-  --color-brand-100: #e4eef7;
-  --color-brand-200: #c9dcee;
-  --color-brand-300: #a0c2e0;
-  --color-brand-400: #6f9fcc;
-  --color-brand-500: #4c82b8;
-  --color-brand-600: #38699b;
-  --color-brand-700: #2d537e;
-  --color-brand-800: #284768;
-  --color-brand-900: #1a2f47;
-  --color-brand-950: #0d1d2e;
+  /* Quebec neutral scale: warm off-white -> near-black (literal values, no var refs) */
+  --color-brand-50: #f3f3ee;
+  --color-brand-100: #e8e9e2;
+  --color-brand-200: #dcddd8;
+  --color-brand-300: #c2c5bc;
+  --color-brand-400: #9aa096;
+  --color-brand-500: #7c8077;
+  --color-brand-600: #626560;
+  --color-brand-700: #3f423c;
+  --color-brand-800: #171717;
+  --color-brand-900: #171717;
+  --color-brand-950: #171717;
+
+  /* Quebec gold accent scale — the signature accent, used sparingly */
+  --color-gold: #f4c542;
+  --color-gold-strong: #a5760a;
+  --color-gold-deep: #8a6300;
+  --color-gold-soft: #fff4c7;
+  --color-gold-border: #ecda97;
+
+  /* AfriFleet-style landing palette (raw tokens in :root) */
+  --color-af-bg: var(--af-bg);
+  --color-af-surface: var(--af-surface);
+  --color-af-surface-muted: var(--af-surface-muted);
+  --color-af-ink: var(--af-ink);
+  --color-af-muted: var(--af-muted);
+  --color-af-muted-2: var(--af-muted-2);
+  --color-af-border: var(--af-border);
+  --color-af-border-strong: var(--af-border-strong);
+  --color-af-accent: var(--af-accent);
+  --color-af-accent-soft: var(--af-accent-soft);
+  --color-af-dark: var(--af-dark);
+  --color-af-dark-muted: var(--af-dark-muted);
 
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-fade-in: fade-in 0.4s ease-out both;
@@ -116,6 +157,18 @@
       background-position: 200% 0;
     }
   }
+
+  /* Hero live-verification ticker — seamless conveyor, right to left */
+  --animate-workflow-marquee: workflow-marquee 14s linear infinite;
+
+  @keyframes workflow-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 @layer base {
@@ -141,7 +194,7 @@
   }
 
   ::selection {
-    background-color: color-mix(in srgb, #4c82b8 25%, transparent);
+    background-color: color-mix(in srgb, #f4c542 30%, transparent);
   }
 }
 
@@ -207,7 +260,7 @@
     right: 0;
     top: 0;
     height: 2px;
-    background: linear-gradient(to right, transparent, #2dd4bf, transparent);
+    background: linear-gradient(to right, transparent, #f4c542, transparent);
     animation: qbc-scan 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   }
   @keyframes qbc-scan {
