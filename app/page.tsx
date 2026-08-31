@@ -16,6 +16,7 @@ import { LandingHeader } from "@/components/landing/header";
 import { LandingFooter } from "@/components/landing/footer";
 import { RolesSelector } from "@/components/landing/roles-selector";
 import { LiveVerify } from "@/components/landing/live-verify";
+import { Reveal } from "@/components/landing/reveal";
 
 const BTN_DARK =
   "inline-flex items-center justify-center gap-1.5 rounded-[7px] bg-af-ink px-[18px] py-[11px] text-[14px] font-semibold text-white transition-colors hover:bg-af-dark";
@@ -192,7 +193,10 @@ export default function HomePage() {
             { value: "0", label: "documents ever shown to a verifier", accent: true },
             { value: "100%", label: "of checks logged, auditable and revocable", accent: false },
           ].map((s) => (
-            <div key={s.label} className="md:px-8 md:first:pl-0">
+            <div
+              key={s.label}
+              className="flex flex-col items-center justify-center text-center md:items-start md:justify-start md:px-8 md:first:pl-0 md:text-left"
+            >
               <p
                 className={
                   s.accent
@@ -216,22 +220,21 @@ export default function HomePage() {
             against them — nothing else is ever created, stored or shown.
           </SectionHeading>
           <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {capabilities.map((c) => (
-              <div
-                key={c.title}
-                className="flex flex-col rounded-[14px] border border-af-border bg-af-surface p-8 shadow-[0_1px_2px_rgba(23,23,23,0.05)]"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-af-ink text-af-accent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                  <c.icon className="h-5 w-5" strokeWidth={2} />
-                </span>
-                <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.08em] text-af-muted">
-                  {c.cat}
-                </p>
-                <h3 className="mt-3 text-[20px] font-semibold tracking-[-0.02em] text-af-ink">
-                  {c.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-af-muted">{c.body}</p>
-              </div>
+            {capabilities.map((c, i) => (
+              <Reveal key={c.title} className="h-full" delay={i * 70}>
+                <div className="flex h-full flex-col rounded-[14px] border border-af-border bg-af-surface p-8 shadow-[0_1px_2px_rgba(23,23,23,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-af-border-strong hover:shadow-[0_16px_32px_rgba(23,23,23,0.09)] motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-af-ink text-af-accent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <c.icon className="h-5 w-5" strokeWidth={2} />
+                  </span>
+                  <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.08em] text-af-muted">
+                    {c.cat}
+                  </p>
+                  <h3 className="mt-3 text-[20px] font-semibold tracking-[-0.02em] text-af-ink">
+                    {c.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-af-muted">{c.body}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -321,7 +324,10 @@ export default function HomePage() {
                 body: "Every answer carries a signature a shop or a regulator can verify — without the record behind it.",
               },
             ].map((b) => (
-              <div key={b.title} className="bg-af-surface p-8">
+              <div
+                key={b.title}
+                className="bg-af-surface p-8 transition-colors duration-300 hover:bg-af-surface-muted"
+              >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-af-muted">
                   {b.cat}
                 </p>
@@ -344,7 +350,10 @@ export default function HomePage() {
           </SectionHeading>
           <div className="mt-16 grid gap-px overflow-hidden rounded-[10px] border border-af-border bg-af-border sm:grid-cols-2 lg:grid-cols-4">
             {checks.map((c) => (
-              <div key={c.code} className="flex flex-col bg-af-surface p-7">
+              <div
+                key={c.code}
+                className="flex flex-col bg-af-surface p-7 transition-colors duration-300 hover:bg-af-surface-muted"
+              >
                 <p className="font-mono text-[12px] text-af-muted-2">{c.code}</p>
                 <h3 className="mt-4 text-lg font-semibold tracking-[-0.01em] text-af-ink">
                   {c.title}
@@ -367,37 +376,79 @@ export default function HomePage() {
       {/* ============ Pricing ============ */}
       <section id="pricing" className="scroll-mt-[80px] border-t border-af-border bg-af-surface">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="Pricing" title="Simple, per-verification pricing" />
-          <div className="mt-14 max-w-[600px] border-2 border-af-border-strong bg-af-surface p-10 md:p-12">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted-2">
-              Pilot
-            </p>
-            <p className="mt-6 font-display text-[clamp(2.6rem,5vw,3.6rem)] font-bold leading-none tracking-[-0.03em] text-af-ink">
-              ₦0
-              <span className="ml-2 align-middle text-base font-medium tracking-normal text-af-muted">
-                / verification
-              </span>
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-af-muted">
-              Free while we're in pilot. Everything below is included.
-            </p>
-            <ul className="mt-9 space-y-3.5">
-              {[
-                "Full platform access — both portals",
-                "Signed yes/no results in seconds",
-                "Tamper-evident receipts for every check",
-                "Dedicated demo onboarding",
-              ].map((li) => (
-                <li key={li} className="flex items-start gap-3 text-sm text-af-ink">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-af-accent" />
-                  {li}
-                </li>
-              ))}
-            </ul>
-            <Link href="/user/dashboard" className={`${BTN_DARK} mt-10`}>
-              <UserRound className="h-4 w-4" />
-              I&apos;m a user
-            </Link>
+          <SectionHeading eyebrow="Pricing" title="Simple, per-verification pricing">
+            One reference, one price per check. No tiers, no contracts — only what you verify.
+          </SectionHeading>
+          <div className="mt-14 grid gap-6 lg:grid-cols-2">
+            {/* Pilot — free during the pilot */}
+            <Reveal className="h-full">
+              <div className="flex h-full flex-col border-2 border-af-border-strong bg-af-surface p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(23,23,23,0.08)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:p-12">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted-2">
+                  Pilot
+                </p>
+                <p className="mt-6 font-display text-[clamp(2.6rem,5vw,3.6rem)] font-bold leading-none tracking-[-0.03em] text-af-ink">
+                  ₦0
+                  <span className="ml-2 align-middle text-base font-medium tracking-normal text-af-muted">
+                    / verification
+                  </span>
+                </p>
+                <p className="mt-4 text-sm leading-relaxed text-af-muted">
+                  Free while we're in pilot. Everything below is included.
+                </p>
+                <ul className="mt-9 space-y-3.5">
+                  {[
+                    "Full platform access — both portals",
+                    "Signed yes/no results in seconds",
+                    "Tamper-evident receipts for every check",
+                    "Dedicated demo onboarding",
+                  ].map((li) => (
+                    <li key={li} className="flex items-start gap-3 text-sm text-af-ink">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-af-accent" />
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/user/dashboard" className={`${BTN_DARK} mt-10`}>
+                  <UserRound className="h-4 w-4" />
+                  I&apos;m a user
+                </Link>
+              </div>
+            </Reveal>
+
+            {/* Launch — per-verification, after the pilot */}
+            <Reveal className="h-full" delay={120}>
+              <div className="flex h-full flex-col border border-af-border bg-af-surface p-10 transition-all duration-300 hover:-translate-y-1 hover:border-af-border-strong hover:shadow-[0_16px_32px_rgba(23,23,23,0.08)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:p-12">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted-2">
+                  Launch
+                </p>
+                <p className="mt-6 font-display text-[clamp(2.6rem,5vw,3.6rem)] font-bold leading-none tracking-[-0.03em] text-af-ink">
+                  ₦50
+                  <span className="ml-2 align-middle text-base font-medium tracking-normal text-af-muted">
+                    / verification
+                  </span>
+                </p>
+                <p className="mt-4 text-sm leading-relaxed text-af-muted">
+                  For after the pilot. Pay only for checks you actually run.
+                </p>
+                <ul className="mt-9 space-y-3.5">
+                  {[
+                    "Per-check pricing — no subscriptions",
+                    "The same signed answers, instantly",
+                    "Volume pricing from 1,000 checks / mo",
+                    "Team dashboard when the API ships",
+                  ].map((li) => (
+                    <li key={li} className="flex items-start gap-3 text-sm text-af-ink">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-af-accent" />
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/business/dashboard" className={`${BTN_OUTLINE} mt-10`}>
+                  <Building2 className="h-4 w-4" />
+                  I&apos;m a business
+                </Link>
+              </div>
+            </Reveal>
           </div>
           <p className="mt-6 text-[13px] text-af-muted">
             Prices shown are for the demo. All identity data is synthetic.

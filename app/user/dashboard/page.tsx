@@ -37,7 +37,8 @@ import { useApp } from "@/state/app-context";
 import { timeAgo } from "@/lib/format";
 
 export default function DashboardPage() {
-  const { loading, store, activeIdentity, activeGrants, activeLog, businessesById } = useApp();
+  const { loading, store, activeIdentity, setActiveIdentity, activeGrants, activeLog, businessesById } =
+    useApp();
 
   if (loading || !store) {
     return (
