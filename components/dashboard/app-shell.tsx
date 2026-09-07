@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import {
   ArrowLeft,
@@ -10,6 +10,7 @@ import {
   HelpCircle,
   History,
   LayoutDashboard,
+  LogOut,
   Menu,
   ScanSearch,
   ScrollText,
@@ -119,7 +120,9 @@ function FilterLink({
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { store, activeIdentity, activeGrants, businessesById } = useApp();
+  const { store, activeIdentity, activeGrants, businessesById, signedIn, signOut } = useApp();
+  const router = useRouter();
+  if (!signedIn && typeof window !== "undefined") { router.replace(pathname.startsWith("/business") ? "/auth/business/signin" : "/auth/user/signin"); return null; }
   const filterB = useQueryParam("b");
   const filterU = useQueryParam("u");
 
@@ -259,6 +262,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       </nav>
 
       <div className="flex-1" />
+      <button type="button" onClick={() => { signOut(); router.push(`/auth/${mode}/signin`); }} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-brand-700 transition-colors hover:bg-rose-50 hover:text-rose-700">
+        <LogOut className="h-4 w-4" />
+        Sign out
+      </button>
       <div className="rounded-lg border border-gold-border bg-gold-soft/60 px-3 py-2.5 text-xs leading-relaxed text-brand-800">
         Demo session : synthetic identity data. Nothing here is real.
       </div>

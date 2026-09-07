@@ -43,6 +43,9 @@ interface AppContextValue {
   setActiveIdentity: (identityId: string) => Promise<void>;
   resetDemo: () => Promise<void>;
   getVerification: (id: string) => Promise<Verification | null>;
+  signedIn: boolean;
+  signIn: (kind: "user" | "business", id: string) => void;
+  signOut: () => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -50,8 +53,10 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [store, setStore] = useState<Store | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
+    setSignedIn(window.localStorage.getItem("qbc.auth") === "signed-in");
     let alive = true;
     api.loadStoreApi().then((s) => {
       if (alive) {
@@ -63,6 +68,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       alive = false;
     };
   }, []);
+  const signIn = useCallback((kind: "user" | "business", id: string) => { localStorage.setItem("qbc.auth", "signed-in"); localStorage.setItem("qbc.auth.kind", kind); localStorage.setItem("qbc.auth.id", id); setSignedIn(true); }, []);
+  const signOut = useCallback(() => { localStorage.removeItem("qbc.auth"); setSignedIn(false); }, []);
 
   const enroll = useCallback(async (input: EnrollInput) => {
     const { store: next, identity } = await api.enrollIdentityApi(input);
@@ -145,6 +152,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setActiveIdentity,
     resetDemo,
     getVerification,
+    signedIn, signIn, signOut,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
