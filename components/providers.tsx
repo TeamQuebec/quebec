@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 export function Providers({ children }: { children: ReactNode }) {
   // The landing page renders its own Quebec-style header/footer, and the portal
-  // pages (/user, /business) own their chrome via the AppShell sidebar — so the
+  // pages (/user, /business) own their chrome via the AppShell sidebar : so the
   // global TopNav/Footer only appear on the pages between.
   const pathname = usePathname();
   const isLanding = pathname === "/";

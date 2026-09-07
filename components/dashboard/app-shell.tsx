@@ -113,7 +113,7 @@ function FilterLink({
 
 /**
  * Modern portal shell: a fixed sidebar on desktop, a drawer on mobile, and a
- * sticky top bar. The sidebar is the dashboard itself — an identity chip, then
+ * sticky top bar. The sidebar is the dashboard itself : an identity chip, then
  * a nav whose sections each expand to the entities on that page (third parties
  * on the user side, users on the business side). No portal switch in here.
  */
@@ -190,7 +190,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
     ) : (
       <div className="rounded-xl border border-dashed border-brand-200 p-3 text-xs leading-relaxed text-muted-foreground">
-        No reference yet —{" "}
+        No reference yet :{" "}
         <Link href="/user/enroll" className="font-medium text-gold-strong hover:underline">
           enroll
         </Link>{" "}
@@ -260,7 +260,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex-1" />
       <div className="rounded-lg border border-gold-border bg-gold-soft/60 px-3 py-2.5 text-xs leading-relaxed text-brand-800">
-        Demo session — synthetic identity data. Nothing here is real.
+        Demo session : synthetic identity data. Nothing here is real.
       </div>
     </div>
   );

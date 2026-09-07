@@ -13,7 +13,7 @@ interface RevealProps {
 /**
  * Subtle fade-up when the element first scrolls into view. Content is shown
  * immediately when IntersectionObserver is unavailable or reduced motion is
- * set — this is a progressive enhancement, never a hard gate on visibility.
+ * set : this is a progressive enhancement, never a hard gate on visibility.
  */
 export function Reveal({ children, className, delay = 0 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);

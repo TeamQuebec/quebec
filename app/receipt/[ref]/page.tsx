@@ -48,7 +48,7 @@ export default function ReceiptPage() {
         </h1>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
           No verification record matches <span className="ref-plate">{params.ref}</span>.
-          Receipts live in the demo&apos;s in-memory trail — resetting demo data clears them.
+          Receipts live in the demo&apos;s in-memory trail : resetting demo data clears them.
         </p>
         <Button className="mt-7" variant="outline" asChild>
           <Link href="/business/verify">

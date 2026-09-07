@@ -11,7 +11,7 @@ const TONES: Record<string, string> = {
 
 /**
  * KPI stat card: small uppercase label, large display value, hint line, and a
- * tinted icon chip. The icon carries the tone — the number always stays in
+ * tinted icon chip. The icon carries the tone : the number always stays in
  * brand ink so the metric itself is never color-coded.
  */
 export function KpiCard({

@@ -46,8 +46,8 @@ function validateField(field: Field, value: string): string | undefined {
   }
   const digits = value.replace(/\D/g, "");
   if (digits.length === 0) return "Enter your 11-digit NIN.";
-  if (digits.length < 11) return `${digits.length}/11 digits — keep typing.`;
-  if (digits.length > 11) return "Exactly 11 digits — remove the extras.";
+  if (digits.length < 11) return `${digits.length}/11 digits : keep typing.`;
+  if (digits.length > 11) return "Exactly 11 digits : remove the extras.";
   return undefined;
 }
 
@@ -82,7 +82,7 @@ export function EnrollForm() {
   const [submitting, setSubmitting] = useState(false);
   const [identity, setIdentity] = useState<Identity | null>(null);
 
-  // Inline validation — an error only appears after the field is touched, then
+  // Inline validation : an error only appears after the field is touched, then
   // updates live as the user fixes it. Nothing waits for submit.
   const errName = touched.name ? validateField("name", name) : undefined;
   const errDob = touched.dob ? validateField("dob", dob) : undefined;
@@ -102,7 +102,7 @@ export function EnrollForm() {
     setNin(u.nin);
     setTouched({ name: true, dob: true, nin: true });
     toast("Demo identity loaded", {
-      description: "A synthetic record has been filled in — you can edit it or submit as-is.",
+      description: "A synthetic record has been filled in : you can edit it or submit as-is.",
     });
   };
 
@@ -128,7 +128,7 @@ export function EnrollForm() {
   const downloadReference = () => {
     if (!identity) return;
     const text = [
-      "QUEBEC — IDENTITY REFERENCE",
+      "QUEBEC : IDENTITY REFERENCE",
       "----------------------------",
       `Reference: ${identity.uniqueId}`,
       `Created:   ${formatDateTime(identity.createdAt)}`,
@@ -137,10 +137,10 @@ export function EnrollForm() {
       "verify facts about you (age, name, verified identity) WITHOUT seeing",
       "your name, date of birth or NIN.",
       "",
-      "Keep it safe. If you lose it you can re-enroll — but businesses you",
+      "Keep it safe. If you lose it you can re-enroll : but businesses you",
       "shared the old reference with would need the new one from you.",
       "",
-      "Quebec demo — synthetic identity data, no real personal information.",
+      "Quebec demo : synthetic identity data, no real personal information.",
     ].join("\n");
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -151,7 +151,7 @@ export function EnrollForm() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast.success("Reference downloaded — save it somewhere safe");
+    toast.success("Reference downloaded : save it somewhere safe");
   };
 
   // ---- Success state -------------------------------------------------------
@@ -170,22 +170,22 @@ export function EnrollForm() {
               </h2>
               <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
                 This is the <span className="font-semibold text-brand-900">only</span> thing you
-                will ever share with a business. It verifies facts about you — it never reveals
+                will ever share with a business. It verifies facts about you : it never reveals
                 your name, date of birth, or NIN.
               </p>
             </div>
 
-            {/* Save / screenshot prompt — this ID is their permanent reference */}
+            {/* Save / screenshot prompt : this ID is their permanent reference */}
             <div className="mx-auto mt-7 max-w-md rounded-xl border-2 border-dashed border-amber-300 bg-amber-50/70 px-5 py-5 text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">
-                Save this now — it&apos;s your permanent reference
+                Save this now : it&apos;s your permanent reference
               </p>
               <p className="ref-plate mt-2 text-3xl font-semibold tracking-wider text-brand-950">
                 {identity.uniqueId}
               </p>
               <p className="mt-2 text-xs leading-relaxed text-amber-800">
                 Screenshot this screen, or download it below. If you lose it, you&apos;ll need to
-                re-enroll — and businesses you shared the old reference with would need the new one.
+                re-enroll : and businesses you shared the old reference with would need the new one.
               </p>
               <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
                 <CopyButton text={identity.uniqueId} />
@@ -203,7 +203,7 @@ export function EnrollForm() {
               </p>
               <p className="flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-brand-400" />
-                You can see — and revoke — every check they run, anytime.
+                You can see : and revoke : every check they run, anytime.
               </p>
             </div>
 
@@ -244,7 +244,7 @@ export function EnrollForm() {
                 Enroll your identity
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Three fields — that&apos;s all we need. Your record stays private: encrypted,
+                Three fields : that&apos;s all we need. Your record stays private: encrypted,
                 and never shown raw to verifiers.
               </p>
             </div>
@@ -285,7 +285,7 @@ export function EnrollForm() {
                 <p className="text-xs text-rose-600">{errName}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  Your legal name — letters, spaces, hyphens.
+                  Your legal name : letters, spaces, hyphens.
                 </p>
               )}
             </div>
@@ -362,7 +362,7 @@ export function EnrollForm() {
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold-strong" />
               <p className="text-xs leading-relaxed text-brand-800">
                 Your details are stored <span className="font-semibold">encrypted</span> and are
-                never shown raw to verifiers — they only ever receive the signed YES / NO answer
+                never shown raw to verifiers : they only ever receive the signed YES / NO answer
                 to the checks you allow.
               </p>
             </div>
@@ -393,7 +393,7 @@ export function EnrollForm() {
             )}
 
             <p className="text-center text-xs leading-relaxed text-muted-foreground">
-              Synthetic demo only — no real identity registry is contacted, and nothing you type
+              Synthetic demo only : no real identity registry is contacted, and nothing you type
               is validated against real data.
             </p>
           </form>

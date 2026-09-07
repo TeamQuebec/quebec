@@ -3,7 +3,7 @@ import { pseudoHash } from "@/lib/refs";
 
 /**
  * Deterministic QR-style grid derived from a receipt's hash. Purely decorative
- * for the tamper-evident look — Phase 2 replaces it with a real signature /
+ * for the tamper-evident look : Phase 2 replaces it with a real signature /
  * verification endpoint. Same input always produces the same pattern.
  */
 export function FakeQr({ value, className }: { value: string; className?: string }) {

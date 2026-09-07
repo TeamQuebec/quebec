@@ -141,7 +141,7 @@ export function AccessList() {
               <Badge variant="muted">Revoked</Badge>
             </p>
             <p className="truncate text-xs text-muted-foreground">
-              Access removed{g.revokedAt ? ` ${timeAgo(g.revokedAt)}` : ""} — they can no longer
+              Access removed{g.revokedAt ? ` ${timeAgo(g.revokedAt)}` : ""} : they can no longer
               verify anything.
             </p>
           </div>
@@ -199,7 +199,7 @@ export function AccessList() {
             <DialogDescription>
               {toRevoke ? businessesById[toRevoke.businessId]?.name : "This business"} will
               immediately lose the ability to verify any facts against your reference. Their past
-              checks stay in your log — but no new ones will succeed. You can allow them again
+              checks stay in your log : but no new ones will succeed. You can allow them again
               later.
             </DialogDescription>
           </DialogHeader>

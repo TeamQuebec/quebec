@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-/** The verification pipeline — a business asks one fact about a reference. */
+/** The verification pipeline : a business asks one fact about a reference. */
 const STEPS = ["Ask", "Match", "Verify", "Sign", "Log"];
 
 /**
@@ -24,7 +24,7 @@ export function LiveVerify() {
 
   return (
     <div className="mx-auto w-full max-w-[560px]">
-      {/* Header — route */}
+      {/* Header : route */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <p className="flex items-center gap-1.5 text-[15px] font-semibold tracking-[-0.01em] text-af-ink">
           Verify
@@ -40,7 +40,7 @@ export function LiveVerify() {
         </p>
       </div>
 
-      {/* Pipeline marquee — continuous right-to-left conveyor */}
+      {/* Pipeline marquee : continuous right-to-left conveyor */}
       <div className="mt-5 overflow-hidden rounded-[10px] border border-af-border bg-af-surface py-3.5 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
         <div className="animate-workflow-marquee flex w-max items-center motion-reduce:animate-none">
           {[0, 1].map((copy) => (
@@ -61,7 +61,7 @@ export function LiveVerify() {
         </div>
       </div>
 
-      {/* Connector — pipeline ↓ verdict */}
+      {/* Connector : pipeline ↓ verdict */}
       <svg
         className="my-5 ml-[3px]"
         width="10"

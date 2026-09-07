@@ -154,7 +154,7 @@ export function ReceiptView({
                 Reference checked
               </p>
               <p className="ref-plate mt-1 text-sm font-semibold text-brand-950">
-                {verification.identityReference ?? "—"}
+                {verification.identityReference ?? ":"}
               </p>
             </div>
             <div>
@@ -177,7 +177,7 @@ export function ReceiptView({
           <div className="mt-6 flex items-center gap-2 rounded-lg bg-brand-50 px-4 py-2.5">
             <ShieldCheck className="h-4 w-4 shrink-0 text-gold-strong" />
             <p className="text-xs text-brand-800">
-              This receipt contains <span className="font-semibold">no personal data</span> — only
+              This receipt contains <span className="font-semibold">no personal data</span> : only
               the facts requested and the answers given.
             </p>
           </div>
@@ -204,7 +204,7 @@ export function ReceiptView({
               </button>
               <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
                 Alter any detail above and the signature breaks. Anyone can re-check this receipt
-                against the registry at any time — a judge, an auditor, or the holder.
+                against the registry at any time : a judge, an auditor, or the holder.
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-center gap-1.5">

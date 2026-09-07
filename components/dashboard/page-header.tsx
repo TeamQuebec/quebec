@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Shared portal page header — gold eyebrow, display title, description, and
+ * Shared portal page header : gold eyebrow, display title, description, and
  * an optional right-aligned actions cluster. Replaces the hand-rolled headers
  * so every portal page reads as one system.
  */

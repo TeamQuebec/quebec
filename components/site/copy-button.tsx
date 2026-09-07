@@ -30,7 +30,7 @@ export function CopyButton({
     try {
       await navigator.clipboard.writeText(text);
     } catch {
-      // Clipboard API unavailable (http / iframe) — fall back to a prompt.
+      // Clipboard API unavailable (http / iframe) : fall back to a prompt.
       const ta = document.createElement("textarea");
       ta.value = text;
       document.body.appendChild(ta);

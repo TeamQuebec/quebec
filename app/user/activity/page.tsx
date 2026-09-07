@@ -42,7 +42,7 @@ export default function ActivityPage() {
             Access log
           </CardTitle>
           <CardDescription>
-            Read-only, transparent record of every check and permission change — you stay in the loop.
+            Read-only, transparent record of every check and permission change: you stay in the loop.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -52,7 +52,7 @@ export default function ActivityPage() {
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5 text-gold-strong" />
-        Every entry above is a real event in this demo&apos;s audit trail — no data behind the scenes.
+        Every entry above is a real event in this demo&apos;s audit trail: no data behind the scenes.
       </p>
     </AppShell>
   );

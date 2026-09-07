@@ -17,9 +17,9 @@ import { useApp } from "@/state/app-context";
 import { computeAge, formatDateTime, formatDob } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/** "40172345678" -> "•••••••5678" — only the tail ever visible. */
+/** "40172345678" -> "•••••••5678" : only the tail ever visible. */
 function maskNin(nin: string): string {
-  if (!nin) return "—";
+  if (!nin) return ":";
   return `${"•".repeat(Math.max(0, nin.length - 4))}${nin.slice(-4)}`;
 }
 
@@ -35,7 +35,7 @@ function DetailRow({ label, children }: { label: string; children: ReactNode }) 
 }
 
 /**
- * The user's identity record — the whole thing that exists behind a reference.
+ * The user's identity record : the whole thing that exists behind a reference.
  * NIN is always masked; the point of the page is that there is nothing else to
  * see, and that nothing on it is ever shared with a verifier.
  */
@@ -132,7 +132,7 @@ export function IdentityProfile() {
         <div>
           <p className="text-sm font-semibold text-brand-950">This is everything that exists.</p>
           <p className="mt-1 text-xs leading-relaxed text-brand-800">
-            Three fields built this record — nothing else is stored. Businesses only ever see a
+            Three fields built this record : nothing else is stored. Businesses only ever see a
             signed YES / NO to the facts you grant, never this page.
           </p>
         </div>

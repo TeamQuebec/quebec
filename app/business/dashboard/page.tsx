@@ -88,7 +88,7 @@ export default function BusinessDashboardPage() {
       <PageHeader
         eyebrow="Business dashboard"
         title={activeBusinessName}
-        description="Everyone under your Quebec verification — how you're connected, what's been checked, and what you can still ask."
+        description="Everyone under your Quebec verification: how you're connected, what's been checked, and what you can still ask."
         actions={
           <Button variant="brand" size="sm" asChild>
             <Link href="/business/verify">
@@ -188,7 +188,7 @@ export default function BusinessDashboardPage() {
             <CardContent className="px-6">
               {users.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-brand-200 bg-brand-50/40 px-4 py-8 text-center text-xs text-muted-foreground">
-                  No users yet — when a holder shares a reference with you they&apos;ll appear here.
+                  No users yet: when a holder shares a reference with you they&apos;ll appear here.
                 </p>
               ) : (
                 <ul className="divide-y divide-border">

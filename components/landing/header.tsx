@@ -13,7 +13,7 @@ const NAV_LINKS = [
   { label: "Built on", href: "#built-on" },
 ];
 
-/** Quebec landing nav — thin, small text, compact user/business CTAs. */
+/** Quebec landing nav : thin, small text, compact user/business CTAs. */
 export function LandingHeader() {
   const [open, setOpen] = useState(false);
 

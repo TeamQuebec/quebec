@@ -27,7 +27,7 @@ export default function BusinessHistoryPage() {
       <PageHeader
         eyebrow="Business dashboard"
         title="Verification history"
-        description="Every signed check your business has run — the reference, the facts asked, the verdict, and a re-checkable receipt for each."
+        description="Every signed check your business has run: the reference, the facts asked, the verdict, and a receipt you can check again for each."
       />
 
       <Card>
@@ -37,7 +37,7 @@ export default function BusinessHistoryPage() {
             Check history
           </CardTitle>
           <CardDescription>
-            Receipts stay valid forever — anyone can re-check one against the registry without
+            Receipts stay valid forever: anyone can check one again against the registry without
             ever seeing the record behind it.
           </CardDescription>
         </CardHeader>

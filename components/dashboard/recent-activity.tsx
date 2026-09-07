@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export interface RecentActivityItem {
   id: string;
   icon: LucideIcon;
-  /** tinted chip classes — e.g. "bg-gold-soft text-gold-strong" */
+  /** tinted chip classes : e.g. "bg-gold-soft text-gold-strong" */
   iconClass: string;
   title: string;
   sub?: string;

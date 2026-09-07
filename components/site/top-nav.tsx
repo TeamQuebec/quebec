@@ -87,7 +87,7 @@ export function TopNav() {
           <ModeSwitch />
         </div>
 
-        {/* Mobile menu — mode switch lives inside the sheet on small screens */}
+        {/* Mobile menu : mode switch lives inside the sheet on small screens */}
         <div className="flex items-center gap-2 lg:hidden">
           <Sheet>
             <SheetTrigger asChild>

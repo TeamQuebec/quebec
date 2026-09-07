@@ -52,7 +52,7 @@ export default function ProfilePage() {
       <PageHeader
         eyebrow="Your portal"
         title="Your record"
-        description="Everything that exists behind your reference — a name, a date of birth, a NIN, and nothing else. Businesses only ever see signed YES / NO answers to what you grant."
+        description="Everything that exists behind your reference: a name, a date of birth, a NIN, and nothing else. Businesses only ever see signed YES or NO answers to what you grant."
       />
       <IdentityProfile />
     </AppShell>

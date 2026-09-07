@@ -70,7 +70,7 @@ export default function DashboardPage() {
             You don&apos;t have a reference yet
           </h1>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Enroll once to get your Quebec reference — then share it with businesses instead of
+            Enroll once to get your Quebec reference: then share it with businesses instead of
             your name, date of birth or NIN.
           </p>
           <Button className="mt-7" size="lg" variant="brand" asChild>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
           </div>
           <p className="mt-4 max-w-2xl text-xs leading-relaxed text-muted-foreground">
             This is the <span className="font-semibold text-brand-800">only</span> thing you
-            share. Businesses use it to verify facts about you — they never see your name, date
+            share. Businesses use it to verify facts about you: they never see your name, date
             of birth or NIN. You can revoke their access at any time below.
           </p>
         </CardContent>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
             <CardContent className="px-6">
               {parties.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-brand-200 bg-brand-50/40 px-4 py-8 text-center text-xs text-muted-foreground">
-                  No businesses yet — share your reference and they&apos;ll appear here.
+                  No businesses yet: share your reference and they&apos;ll appear here.
                 </p>
               ) : (
                 <ul className="divide-y divide-border">

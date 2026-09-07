@@ -12,7 +12,7 @@ export const STATUS_META: Record<
   revoked: { label: "Revoked", badge: "muted", dot: "bg-brand-300" },
 };
 
-/** Order used to sort rows — current first, then pending, then revoked. */
+/** Order used to sort rows : current first, then pending, then revoked. */
 export function grantStatusRank(status: GrantStatus): number {
   return status === "granted" ? 0 : status === "requested" ? 1 : 2;
 }

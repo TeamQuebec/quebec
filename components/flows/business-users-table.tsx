@@ -60,7 +60,7 @@ export function BusinessUsersTable() {
       verificationsByIdentity.set(v.identityId, list);
     }
 
-    // Build rows explicitly — no nulls can reach the array, so `Row[]` always holds.
+    // Build rows explicitly : no nulls can reach the array, so `Row[]` always holds.
     const list: Row[] = [];
     for (const grant of store.grants) {
       if (grant.businessId !== businessId) continue;
@@ -93,7 +93,7 @@ export function BusinessUsersTable() {
         <p className="mt-2 text-sm font-medium text-brand-900">No users yet</p>
         <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
           When someone shares their Quebec reference with you and runs a check, they&apos;ll
-          appear here — along with their status and verification history.
+          appear here : along with their status and verification history.
         </p>
       </div>
     );
@@ -153,7 +153,7 @@ export function BusinessUsersTable() {
                 <GrantStatusBadge status={grant.status} />
               </TableCell>
               <TableCell className="hidden text-xs text-muted-foreground lg:table-cell">
-                {grant.scopes.length > 0 ? scopeSummary(grant.scopes) : "—"}
+                {grant.scopes.length > 0 ? scopeSummary(grant.scopes) : ":"}
               </TableCell>
               <TableCell className="hidden whitespace-nowrap text-xs text-muted-foreground sm:table-cell">
                 {lastVerifiedAt ? timeAgo(lastVerifiedAt) : "Never"}

@@ -79,7 +79,7 @@ export function ThirdPartiesTable() {
         <p className="mt-2 text-sm font-medium text-brand-900">No third parties yet</p>
         <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
           Share your Quebec reference with a business and it will appear here the moment it
-          checks a fact about you — current, pending or revoked.
+          checks a fact about you : current, pending or revoked.
         </p>
       </div>
     );
@@ -212,7 +212,7 @@ export function ThirdPartiesTable() {
 
       <Pagination page={safePage} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
 
-      {/* Confirm revoke — same copy as the old access-list dialog */}
+      {/* Confirm revoke : same copy as the old access-list dialog */}
       <Dialog open={toRevoke !== null} onOpenChange={(open) => !open && setToRevoke(null)}>
         <DialogContent>
           <DialogHeader>
@@ -222,7 +222,7 @@ export function ThirdPartiesTable() {
             <DialogDescription>
               {toRevoke ? businessesById[toRevoke.businessId]?.name : "This third party"} will
               immediately lose the ability to verify any facts against your reference. Their past
-              checks stay in your log — but no new ones will succeed. You can allow them again
+              checks stay in your log : but no new ones will succeed. You can allow them again
               later.
             </DialogDescription>
           </DialogHeader>

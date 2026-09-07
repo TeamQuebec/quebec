@@ -20,11 +20,11 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Quebec — Verify a fact, not the whole record",
+    default: "Quebec: Verify a fact, not the whole record",
     template: "%s · Quebec",
   },
   description:
-    "Quebec lets you confirm a single fact about someone — their age, their name, that they have a verified identity — without ever exposing their full record.",
+    "Quebec lets you confirm a single fact about someone: their age, their name, that they have a verified identity, without ever exposing their full record.",
 };
 
 export default function RootLayout({

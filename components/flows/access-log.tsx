@@ -36,7 +36,7 @@ export function AccessLog() {
         <ScrollText className="h-6 w-6 text-brand-300" />
         <p className="mt-2 text-sm font-medium text-brand-900">Nothing logged yet</p>
         <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
-          Every check a business runs against your reference will appear here — transparent and
+          Every check a business runs against your reference will appear here : transparent and
           yours to audit.
         </p>
       </div>

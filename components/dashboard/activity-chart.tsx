@@ -31,7 +31,7 @@ export function buildActivityPoints(isoTimes: string[]): ActivityPoint[] {
 }
 
 /**
- * Lightweight 7-day activity bar chart — no chart library. Thin gold bars with
+ * Lightweight 7-day activity bar chart : no chart library. Thin gold bars with
  * rounded tops anchored to a shared baseline, a hover tooltip per bar, and the
  * current day emphasized in dark ink. Single series, so no legend is needed.
  */
@@ -55,7 +55,7 @@ export function ActivityChart({ data }: { data: ActivityPoint[] }) {
     <div className="pt-2">
       <div
         role="img"
-        aria-label={`Verifications per day, last 7 days — ${data
+        aria-label={`Verifications per day, last 7 days : ${data
           .map((d) => `${d.label}: ${d.value}`)
           .join(", ")}.`}
       >

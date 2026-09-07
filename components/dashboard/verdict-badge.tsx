@@ -13,7 +13,7 @@ const VERDICT_META: Record<
   unconfirmed: { label: "UNCONFIRMED", variant: "warning" },
 };
 
-/** Shared verdict pill — one mapping for history tables, feeds and receipts. */
+/** Shared verdict pill : one mapping for history tables, feeds and receipts. */
 export function VerdictBadge({ verdict }: { verdict: Verdict }) {
   const meta = VERDICT_META[verdict];
   return <Badge variant={meta.variant}>{meta.label}</Badge>;

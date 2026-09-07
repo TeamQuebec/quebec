@@ -24,8 +24,8 @@ export function Footer() {
           <div className="max-w-sm space-y-3">
             <Logo />
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Verify a single fact about someone — their age, their name, that
-              they have a verified identity — without ever exposing the full
+              Verify a single fact about someone : their age, their name, that
+              they have a verified identity : without ever exposing the full
               record.
             </p>
           </div>
@@ -65,7 +65,7 @@ export function Footer() {
         </div>
 
         <p className="mt-6 text-xs text-muted-foreground">
-          Quebec — proving a fact without revealing the whole record.
+          Quebec : proving a fact without revealing the whole record.
         </p>
       </div>
     </footer>

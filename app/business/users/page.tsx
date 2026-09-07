@@ -38,7 +38,7 @@ export default function BusinessUsersPage() {
             Access
           </CardTitle>
           <CardDescription>
-            Each row links straight to a verification — all you need is their reference.
+            Each row links straight to a verification: all you need is their reference.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

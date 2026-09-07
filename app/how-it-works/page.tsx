@@ -21,8 +21,8 @@ import { Badge } from "@/components/ui/badge";
 const STEPS = [
   {
     n: "01",
-    title: "The holder shares a reference — not their ID",
-    body: "Your name, date of birth and NIN stay inside Quebec's vault. The only thing you share with a shop is a short reference like QBC-8X92-1F — which is useless on its own.",
+    title: "The holder shares a reference : not their ID",
+    body: "Your name, date of birth and NIN stay inside Quebec's vault. The only thing you share with a shop is a short reference like QBC-8X92-1F : which is useless on its own.",
     icon: Fingerprint,
     chip: "You share this",
     chipValue: "QBC-8X92-1F",
@@ -30,7 +30,7 @@ const STEPS = [
   {
     n: "02",
     title: "The business asks a yes / no question",
-    body: "The shop asks Quebec: “Is this person over 18?”. The answer is computed from your verified record — the record itself never leaves the vault, and the shop can't ask for your DOB or NIN.",
+    body: "The shop asks Quebec: “Is this person over 18?”. The answer is computed from your verified record : the record itself never leaves the vault, and the shop can't ask for your DOB or NIN.",
     icon: Scale,
     chip: "They see this",
     chipValue: "Over 18?  →",
@@ -38,7 +38,7 @@ const STEPS = [
   {
     n: "03",
     title: "They get a signed answer and a receipt",
-    body: "The shop receives an unambiguous YES — signed, timestamped and tied to a tamper-evident receipt. The receipt proves the check happened, without exposing the data behind it.",
+    body: "The shop receives an unambiguous YES : signed, timestamped and tied to a tamper-evident receipt. The receipt proves the check happened, without exposing the data behind it.",
     icon: Stamp,
     chip: "They keep this",
     chipValue: "Receipt · VFY-…",
@@ -49,17 +49,17 @@ const TRUST_POINTS = [
   {
     icon: Stamp,
     title: "The YES is signed & sealed",
-    body: "Every answer carries a cryptographic record hash. Change a single byte on the receipt — the timestamp, the answer, anything — and the signature breaks. There is no way to edit a YES after the fact.",
+    body: "Every answer carries a cryptographic record hash. Change a single byte on the receipt : the timestamp, the answer, anything : and the signature breaks. There is no way to edit a YES after the fact.",
   },
   {
     icon: ShieldCheck,
     title: "The answer comes from a real record",
-    body: "The shop isn't trusting a piece of paper someone typed. The YES is generated from a verified identity record held by Quebec — the same kind of record a bank or NIMC would rely on. Faking the answer means breaking the vault, not forging a document.",
+    body: "The shop isn't trusting a piece of paper someone typed. The YES is generated from a verified identity record held by Quebec : the same kind of record a bank or NIMC would rely on. Faking the answer means breaking the vault, not forging a document.",
   },
   {
     icon: History,
     title: "Every check is auditable & revocable",
-    body: "The holder sees every check on their dashboard and can revoke access at any time. A business that shows a fake receipt gets caught — and a business that loses access can't check anything more.",
+    body: "The holder sees every check on their dashboard and can revoke access at any time. A business that shows a fake receipt gets caught : and a business that loses access can't check anything more.",
   },
 ];
 
@@ -72,17 +72,17 @@ const COMPARISON: { label: string; withId: string; withQuebec: string }[] = [
   {
     label: "Where your data lives after",
     withId: "Copied into the shop's files & cloud",
-    withQuebec: "Nowhere — nothing is copied or stored",
+    withQuebec: "Nowhere : nothing is copied or stored",
   },
   {
     label: "Can the copy be re-used elsewhere?",
-    withId: "Yes — anyone who sees it can reuse it",
-    withQuebec: "No — the reference only answers the questions you allow",
+    withId: "Yes : anyone who sees it can reuse it",
+    withQuebec: "No : the reference only answers the questions you allow",
   },
   {
     label: "Can you take access back?",
-    withId: "No — a photocopy can't be un-copied",
-    withQuebec: "Yes — revoke in one tap, anytime",
+    withId: "No : a photocopy can't be un-copied",
+    withQuebec: "Yes : revoke in one tap, anytime",
   },
   {
     label: "Proof you were checked fairly",
@@ -111,7 +111,7 @@ export default function HowItWorksPage() {
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
             Today, proving you&apos;re old enough for a sim card means handing over your entire
             ID. Quebec inverts that: a business asks a single question, and gets a single,
-            verifiable answer — without ever seeing the whole record.
+            verifiable answer : without ever seeing the whole record.
           </p>
         </div>
       </section>
@@ -165,14 +165,14 @@ export default function HowItWorksPage() {
               reference only the holder controls.
             </p>
             <p className="mt-4 leading-relaxed text-muted-foreground">
-              Keep the receipt. If a dispute reaches a judge or auditor, you can present it — and
+              Keep the receipt. If a dispute reaches a judge or auditor, you can present it : and
               it verifies instantly. Meanwhile the holder&apos;s privacy is intact and your
               business no longer stores copies of documents it doesn&apos;t need.
             </p>
             <Button className="mt-7" variant="brand" asChild>
               <Link href="/business/verify">
                 <Building2 className="h-4 w-4" />
-                Try it — verify a reference
+                Try it : verify a reference
               </Link>
             </Button>
           </div>
@@ -209,12 +209,12 @@ export default function HowItWorksPage() {
             {
               icon: Lock,
               title: "1 · The reference can't be reused",
-              body: "A reference is bound to one holder. Borrowing someone else's reference answers nothing about you — and every check is logged to that holder, who sees it.",
+              body: "A reference is bound to one holder. Borrowing someone else's reference answers nothing about you : and every check is logged to that holder, who sees it.",
             },
             {
               icon: FileX2,
               title: "2 · Receipts can't be forged",
-              body: "Each receipt is sealed with a record hash. Screenshot it, edit it, re-upload it — the signature won't match, and anyone can re-verify.",
+              body: "Each receipt is sealed with a record hash. Screenshot it, edit it, re-upload it : the signature won't match, and anyone can re-verify.",
             },
             {
               icon: EyeOff,

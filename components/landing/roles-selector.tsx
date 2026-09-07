@@ -13,7 +13,7 @@ const ROLES: Role[] = [
   {
     id: "holder",
     name: "Holder",
-    desc: "Enrolls once in three fields. Shares a single reference — never a document — and sees every check ever run against it.",
+    desc: "Enrolls once in three fields. Shares a single reference : never a document : and sees every check ever run against it.",
   },
   {
     id: "verifier",
@@ -23,11 +23,11 @@ const ROLES: Role[] = [
   {
     id: "auditor",
     name: "Auditor",
-    desc: "Re-checks any receipt against the registry. Sees proof and a verdict — never the record behind it.",
+    desc: "Re-checks any receipt against the registry. Sees proof and a verdict : never the record behind it.",
   },
 ];
 
-/** Enterprise segmented role selector — active role carries the yellow accent. */
+/** Enterprise segmented role selector : active role carries the yellow accent. */
 export function RolesSelector() {
   const [active, setActive] = useState("verifier");
   const current = ROLES.find((r) => r.id === active) ?? ROLES[1];

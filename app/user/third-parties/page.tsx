@@ -27,7 +27,7 @@ export default function ThirdPartiesPage() {
       <PageHeader
         eyebrow="Your portal"
         title="Third parties"
-        description="Every business that has ever used your data — current, pending or revoked. Choose who can verify facts about you."
+        description="Every business that has ever used your data: current, pending or revoked. Choose who can verify facts about you."
       />
 
       <Card>
@@ -37,7 +37,7 @@ export default function ThirdPartiesPage() {
             Access
           </CardTitle>
           <CardDescription>
-            Approve new requests, revoke access, or let a business back in — each change is
+            Approve new requests, revoke access, or let a business back in: each change is
             logged to your activity timeline.
           </CardDescription>
         </CardHeader>
@@ -48,7 +48,7 @@ export default function ThirdPartiesPage() {
 
       <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5 text-gold-strong" />
-        Every action above is a real event in this demo&apos;s audit trail — no data behind the scenes.
+        Every action above is a real event in this demo&apos;s audit trail: no data behind the scenes.
       </p>
     </AppShell>
   );

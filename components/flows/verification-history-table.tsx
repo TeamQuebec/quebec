@@ -42,7 +42,7 @@ export function VerificationHistoryTable() {
         <ReceiptText className="h-6 w-6 text-brand-300" />
         <p className="mt-2 text-sm font-medium text-brand-900">No checks on record yet</p>
         <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
-          Every verification you run will appear here with its signed receipt — re-checkable at
+          Every verification you run will appear here with its signed receipt : re-checkable at
           any time.
         </p>
       </div>
@@ -72,7 +72,7 @@ export function VerificationHistoryTable() {
               <TableCell>
                 <div className="min-w-0">
                   <p className="truncate font-mono text-xs font-medium text-brand-950">
-                    {v.identityReference ?? "—"}
+                    {v.identityReference ?? ":"}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">{v.id}</p>
                 </div>

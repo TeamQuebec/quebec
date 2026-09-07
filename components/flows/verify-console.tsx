@@ -63,7 +63,7 @@ const ANSWER_CHIP: Record<CheckAnswer, { label: string; cls: string }> = {
 /**
  * The "work happens" moment: a scan line sweeps the reference, then each
  * selected check ticks over to its real answer, then the signed result is
- * revealed. Timings are cosmetic — the answers still come from the mock API.
+ * revealed. Timings are cosmetic : the answers still come from the mock API.
  */
 function VerificationSequence({
   reference,
@@ -158,7 +158,7 @@ function VerificationSequence({
 
         <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
           <Lock className="h-3.5 w-3.5 shrink-0 text-gold-strong" />
-          Only these facts are answered — nothing else from the record is touched.
+          Only these facts are answered : nothing else from the record is touched.
         </p>
       </div>
     </div>
@@ -194,7 +194,7 @@ export function VerifyConsole() {
     } catch {
       setSequence(null);
       setVerifying(false);
-      toast.error("Verification failed — try again");
+      toast.error("Verification failed : try again");
     }
   };
 
@@ -204,7 +204,7 @@ export function VerifyConsole() {
     setResult(v);
     setVerifying(false);
     toast.success("Verification complete", {
-      description: `Reference ${v.id} — ${v.verdict.toUpperCase().replace("_", " ")}.`,
+      description: `Reference ${v.id} : ${v.verdict.toUpperCase().replace("_", " ")}.`,
     });
   };
 
@@ -257,11 +257,11 @@ export function VerifyConsole() {
         <Card className="overflow-hidden">
           <div className="h-1.5 bg-gradient-to-r from-brand-700 to-gold" />
           <CardContent className="p-6 sm:p-8">
-            {/* Step 1 — reference */}
+            {/* Step 1 : reference */}
             <label htmlFor="qbc-ref" className="block">
               <p className="text-sm font-semibold text-brand-950">Enter the customer&apos;s reference</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Ask for their Quebec reference — that&apos;s all you&apos;ll ever need. No ID card, no copies.
+                Ask for their Quebec reference : that&apos;s all you&apos;ll ever need. No ID card, no copies.
               </p>
             </label>
 
@@ -278,7 +278,7 @@ export function VerifyConsole() {
             </div>
             <p id="qbc-ref-hint" className="mt-2 text-xs text-muted-foreground">
               {reference && !looksValid
-                ? "References look like QBC-8X92-1F — letters and numbers, no dashes needed."
+                ? "References look like QBC-8X92-1F : letters and numbers, no dashes needed."
                 : "Format: QBC-XXXX-XX (dashes optional)."}
             </p>
 
@@ -305,10 +305,10 @@ export function VerifyConsole() {
             </div>
 
             <div className="mt-7 border-t border-border pt-6">
-              {/* Step 2 — checks */}
+              {/* Step 2 : checks */}
               <p className="text-sm font-semibold text-brand-950">What do you need to confirm?</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Select one or more. Quebec answers only the facts you pick — nothing else is revealed.
+                Select one or more. Quebec answers only the facts you pick : nothing else is revealed.
               </p>
 
               <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
@@ -346,7 +346,7 @@ export function VerifyConsole() {
               </div>
             </div>
 
-            {/* Step 3 — verify */}
+            {/* Step 3 : verify */}
             <Button
               size="xl"
               variant="brand"
@@ -369,7 +369,7 @@ export function VerifyConsole() {
 
             <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
               <Fingerprint className="h-3.5 w-3.5 text-brand-400" />
-              You&apos;ll receive only a signed YES / NO and a receipt — never the underlying record.
+              You&apos;ll receive only a signed YES / NO and a receipt : never the underlying record.
             </p>
           </CardContent>
         </Card>

@@ -42,7 +42,7 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
     links: [
       { label: "hello@quebec-demo.dev", href: "mailto:hello@quebec-demo.dev", external: true },
       { label: "Book a demo", href: "/how-it-works" },
-      { label: "@quebec_hack", href: "#" },
+      { label: "@quebec hack", href: "#" },
     ],
   },
 ];
@@ -61,7 +61,7 @@ export function LandingFooter() {
               <span className="text-[17px] font-bold tracking-tight text-white">Quebec</span>
             </div>
             <p className="mt-5 max-w-[300px] text-sm leading-relaxed text-af-muted-2">
-              The identity verification layer for African businesses. Verify a fact — not the
+              The identity verification layer for African businesses. Verify a fact : not the
               whole record.
             </p>
             <div className="mt-6 rounded-md border border-white/10 bg-white/[0.04] px-4 py-3">
@@ -97,7 +97,7 @@ export function LandingFooter() {
         </div>
 
         <div className="mt-14 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-af-muted-2 sm:flex-row sm:items-center sm:justify-between">
-          <p>Quebec — proving a fact without revealing the whole record.</p>
+          <p>Quebec: proving a fact without revealing the whole record.</p>
           <p className="font-mono">ICSC 2026 · TRACK B · DEMO</p>
         </div>
       </div>

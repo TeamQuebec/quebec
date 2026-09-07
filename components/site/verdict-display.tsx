@@ -164,7 +164,7 @@ export function VerdictDisplay({
                 })}
               </div>
               <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                These are the only facts answered — nothing else from the record is revealed.
+                These are the only facts answered : nothing else from the record is revealed.
               </p>
             </div>
           )}
@@ -189,7 +189,7 @@ export function VerdictDisplay({
                 Checked against
               </p>
               <p className="ref-plate mt-1 text-sm font-semibold text-brand-950">
-                {verification.identityReference ?? "—"}
+                {verification.identityReference ?? ":"}
               </p>
             </div>
             <div>
