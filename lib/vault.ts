@@ -80,7 +80,13 @@ function toB64(buf: ArrayBuffer | Uint8Array): string {
   return btoa(s);
 }
 
-function fromB64(b64: string): Uint8Array {
+// Deliberately no return annotation. TypeScript 5.7 made the typed arrays
+// generic, so a bare `Uint8Array` written in a type position means
+// Uint8Array<ArrayBufferLike> — and crypto.subtle rejects that as BufferSource,
+// because it could be backed by a SharedArrayBuffer. Letting the constructor's
+// own type flow through keeps this Uint8Array<ArrayBuffer>, which digest,
+// verify, importKey and decrypt all accept. Same bytes either way.
+function fromB64(b64: string) {
   const bin = atob(b64);
   const out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
