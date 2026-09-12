@@ -179,6 +179,10 @@ export function VerifyConsole() {
   const looksValid = /^QBC-[A-Z0-9]{4}-[A-Z0-9]{2}$/.test(normalized);
   const canVerify = normalized.length > 0 && selected.length > 0 && !verifying;
 
+  // In the catalogue's order, not the order they were ticked. A summary that
+  // reorders itself as you toggle reads as a list that is still moving.
+  const ordered = useMemo(() => CHECK_DEFS.filter((c) => selected.includes(c.id)), [selected]);
+
   const toggleCheck = (id: CheckId) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
 
@@ -236,13 +240,19 @@ export function VerifyConsole() {
         </Badge>
       </div>
 
-      {/* Steps */}
+      {/* Steps. Each one is done when its own inputs are actually complete — the
+          first two used to light up together on arrival, which marked nothing. */}
       <div className="mb-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 sm:gap-x-5">
-        <StepBadge n="1" active={!sequence && !result} done={!!sequence || !!result} label="Reference" />
+        <StepBadge n="1" active={!looksValid} done={looksValid} label="Reference" />
         <span className="h-px w-6 bg-brand-200 sm:w-10" />
-        <StepBadge n="2" active={!sequence && !result} done={!!sequence || !!result} label="What to check" />
+        <StepBadge
+          n="2"
+          active={looksValid && selected.length === 0}
+          done={selected.length > 0}
+          label="What to check"
+        />
         <span className="h-px w-6 bg-brand-200 sm:w-10" />
-        <StepBadge n="3" active={!!sequence || !!result} done={!!result} label="Result" />
+        <StepBadge n="3" active={verifying || !!result} done={!!result} label="Result" />
       </div>
 
       {result ? (
@@ -255,108 +265,160 @@ export function VerifyConsole() {
           onComplete={handleSequenceComplete}
         />
       ) : (
-        <Card>
-          <CardContent className="p-6 sm:p-8">
-            {/* Step 1 : reference */}
-            <label htmlFor="qbc-ref" className="block">
-              <p className="text-sm font-semibold text-brand-950">Enter the customer&apos;s reference</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Ask for their Quebec reference : that&apos;s all you&apos;ll ever need. No ID card, no copies.
+        /* Two columns from lg up: the form on the left, and the ask on the right
+           in its own sticky column.
+
+           The action used to be a bar pinned to the bottom of the card with
+           `sticky bottom-0`. It stayed on screen, but it did so by parking over
+           the check cards — on a phone the last fact sat underneath an opaque
+           bar with nothing to say it was there, so the page looked finished at
+           the point it was asking you to scroll. A column cannot cover anything:
+           the panel is beside the form on a wide screen and simply after it on a
+           narrow one, and either way the button is reachable without hiding the
+           work it is asking about. */
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start">
+          <Card>
+            <CardContent className="p-6 sm:p-8">
+              {/* Step 1 : reference */}
+              <label htmlFor="qbc-ref" className="block">
+                <p className="text-sm font-semibold text-brand-950">Enter the customer&apos;s reference</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Ask for their Quebec reference : that&apos;s all you&apos;ll ever need. No ID card, no copies.
+                </p>
+              </label>
+
+              <div className="relative mt-3">
+                <ScanLine className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-300" />
+                <Input
+                  id="qbc-ref"
+                  value={reference}
+                  onChange={(e) => setReference(e.target.value.toUpperCase())}
+                  placeholder="e.g. QBC-8X92-1F"
+                  className="ref-plate h-14 pl-12 pr-4 text-lg font-semibold"
+                  aria-describedby="qbc-ref-hint"
+                />
+              </div>
+              <p id="qbc-ref-hint" className="mt-2 text-xs text-muted-foreground">
+                {reference && !looksValid
+                  ? "References look like QBC-8X92-1F : letters and numbers, no dashes needed."
+                  : "Format: QBC-XXXX-XX (dashes optional)."}
               </p>
-            </label>
 
-            <div className="relative mt-3">
-              <ScanLine className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-300" />
-              <Input
-                id="qbc-ref"
-                value={reference}
-                onChange={(e) => setReference(e.target.value.toUpperCase())}
-                placeholder="e.g. QBC-8X92-1F"
-                className="ref-plate h-14 pl-12 pr-4 text-lg font-semibold"
-                aria-describedby="qbc-ref-hint"
-              />
-            </div>
-            <p id="qbc-ref-hint" className="mt-2 text-xs text-muted-foreground">
-              {reference && !looksValid
-                ? "References look like QBC-8X92-1F : letters and numbers, no dashes needed."
-                : "Format: QBC-XXXX-XX (dashes optional)."}
-            </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Try an example
+                </span>
+                {EXAMPLE_CHIPS.map((c) => (
+                  <button
+                    key={c.ref}
+                    type="button"
+                    onClick={() => setReference(c.ref)}
+                    className={cn(
+                      "ref-plate inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors",
+                      c.tone === "yes" && "border-gold-border bg-gold-soft text-gold-strong hover:border-gold-strong/40",
+                      c.tone === "no" && "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
+                      c.tone === "none" && "border-brand-200 bg-white text-brand-600 hover:bg-brand-50"
+                    )}
+                  >
+                    {c.ref}
+                    <span className="opacity-60">· {c.label}</span>
+                  </button>
+                ))}
+              </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Try an example
-              </span>
-              {EXAMPLE_CHIPS.map((c) => (
-                <button
-                  key={c.ref}
-                  type="button"
-                  onClick={() => setReference(c.ref)}
+              <div className="mt-7 border-t border-border pt-6">
+                {/* Step 2 : checks */}
+                <p className="text-sm font-semibold text-brand-950">What do you need to confirm?</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Select one or more. Quebec answers only the facts you pick : nothing else is revealed.
+                </p>
+
+                <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                  {CHECK_DEFS.map((c) => {
+                    const checked = selected.includes(c.id);
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => toggleCheck(c.id)}
+                        aria-pressed={checked}
+                        className={cn(
+                          "flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                          // Selected is a state, so it is ink. Gold here meant a
+                          // ticked fact card and a YES answer were one colour.
+                          checked
+                            ? "border-brand-800 bg-brand-50 shadow-sm"
+                            : "border-border bg-white hover:border-brand-200 hover:bg-brand-50/40"
+                        )}
+                      >
+                        <Checkbox
+                          checked={checked}
+                          className="pointer-events-none mt-0.5"
+                          aria-label={c.label}
+                        />
+                        <span>
+                          <span className={cn("block text-sm font-semibold", checked ? "text-brand-950" : "text-brand-900")}>
+                            {c.label}
+                          </span>
+                          <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                            {c.description}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Step 3 : the ask. Sticky only from lg up — below that it has no
+              column of its own and would be the pinned bar again. */}
+          <Card className="lg:sticky lg:top-20">
+            <CardContent className="p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">
+                Ready to send
+              </p>
+              <h2 className="mt-1.5 font-display text-lg font-bold tracking-[-0.02em] text-brand-950">
+                What you&apos;re about to ask
+              </h2>
+
+              <div className="mt-4 rounded-xl border border-border bg-brand-50/40 px-3.5 py-3">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Reference
+                </p>
+                <p
                   className={cn(
-                    "ref-plate inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors",
-                    c.tone === "yes" && "border-gold-border bg-gold-soft text-gold-strong hover:border-gold-strong/40",
-                    c.tone === "no" && "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
-                    c.tone === "none" && "border-brand-200 bg-white text-brand-600 hover:bg-brand-50"
+                    "ref-plate mt-1 truncate text-sm font-semibold",
+                    normalized ? "text-brand-950" : "text-brand-300"
                   )}
                 >
-                  {c.ref}
-                  <span className="opacity-60">· {c.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-7 border-t border-border pt-6">
-              {/* Step 2 : checks */}
-              <p className="text-sm font-semibold text-brand-950">What do you need to confirm?</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Select one or more. Quebec answers only the facts you pick : nothing else is revealed.
-              </p>
-
-              <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                {CHECK_DEFS.map((c) => {
-                  const checked = selected.includes(c.id);
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => toggleCheck(c.id)}
-                      aria-pressed={checked}
-                      className={cn(
-                        "flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                        // Selected is a state, so it is ink. Gold here meant a
-                        // ticked fact card and a YES answer were one colour.
-                        checked
-                          ? "border-brand-800 bg-brand-50 shadow-sm"
-                          : "border-border bg-white hover:border-brand-200 hover:bg-brand-50/40"
-                      )}
-                    >
-                      <Checkbox
-                        checked={checked}
-                        className="pointer-events-none mt-0.5"
-                        aria-label={c.label}
-                      />
-                      <span>
-                        <span className={cn("block text-sm font-semibold", checked ? "text-brand-950" : "text-brand-900")}>
-                          {c.label}
-                        </span>
-                        <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
-                          {c.description}
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })}
+                  {normalized || "Not entered yet"}
+                </p>
               </div>
-            </div>
 
-            {/* Step 3 : verify. Pinned to the bottom of the card so the primary
-                action stays on screen while you work through the facts above it,
-                and it carries the count so you can see what you are about to ask
-                for without scrolling back up. */}
-            <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-8 rounded-b-xl border-t border-border bg-white/95 px-6 pb-5 pt-4 backdrop-blur sm:-mx-8 sm:-mb-8 sm:px-8">
+              <ul className="mt-4 space-y-2.5">
+                {ordered.length === 0 ? (
+                  /* Dashed, like every other "not here" in the product: this is
+                     the shape of a list that hasn't been filled in. */
+                  <li className="rounded-xl border border-dashed border-brand-300 px-3.5 py-3 text-xs leading-relaxed text-brand-700">
+                    No facts selected yet. Whatever you tick appears here before anything is sent.
+                  </li>
+                ) : (
+                  ordered.map((c) => (
+                    <li key={c.id} className="flex items-start gap-2 text-sm text-brand-950">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-verify" aria-hidden="true" />
+                      {c.label}
+                    </li>
+                  ))
+                )}
+              </ul>
+
               <Button
+                type="button"
                 size="xl"
                 variant="brand"
-                className="w-full text-base font-semibold"
+                className="mt-6 w-full text-base font-semibold"
                 disabled={!canVerify}
                 onClick={runVerify}
               >
@@ -375,14 +437,14 @@ export function VerifyConsole() {
                 )}
               </Button>
 
-              <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-                <Fingerprint className="h-3.5 w-3.5 shrink-0 text-brand-400" />
+              <p className="mt-3 flex items-start justify-center gap-1.5 text-center text-xs leading-relaxed text-muted-foreground">
+                <Fingerprint className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-400" aria-hidden="true" />
                 You&apos;ll receive only a signed YES / NO and a receipt : never the underlying
                 record.
               </p>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
