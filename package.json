@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "generate:users": "node scripts/generate-mock-users.mjs"
+    "generate:users": "node scripts/generate-mock-users.mjs",
+    "check:users": "node scripts/generate-mock-users.mjs --check"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.1.2",

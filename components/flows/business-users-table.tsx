@@ -115,7 +115,7 @@ export function BusinessUsersTable() {
           ·{" "}
           <a
             href="/business/users"
-            className="font-medium text-gold-strong hover:underline"
+            className="font-medium text-brand-900 hover:underline"
           >
             show all
           </a>
@@ -138,7 +138,7 @@ export function BusinessUsersTable() {
             <TableRow key={grant.id}>
               <TableCell>
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-soft text-xs font-bold text-gold-strong">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
                     {initials(identity.name)}
                   </span>
                   <div className="min-w-0">

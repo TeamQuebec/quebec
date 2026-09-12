@@ -92,16 +92,16 @@ const ACCENT_STYLES = {
     banner: "from-amber-50/70 to-white border-amber-100",
   },
   muted: {
-    ring: "bg-slate-50 ring-slate-100/70",
-    icon: "text-slate-500",
-    text: "text-slate-500",
-    banner: "from-slate-50/70 to-white border-slate-100",
+    ring: "bg-brand-50 ring-brand-100/70",
+    icon: "text-brand-500",
+    text: "text-brand-500",
+    banner: "from-brand-50/70 to-white border-brand-100",
   },
 } as const;
 
 /** Per-fact answer chips shown under the verdict. */
 const CHECK_ANSWER: Record<CheckResult["answer"], { label: string; cls: string }> = {
-  yes: { label: "YES", cls: "border-gold-border bg-gold-soft text-gold-deep" },
+  yes: { label: "YES", cls: "border-gold-border bg-gold-soft text-gold-strong" },
   no: { label: "NO", cls: "border-rose-200 bg-rose-50 text-rose-700" },
   unable: { label: "UNABLE", cls: "border-amber-200 bg-amber-50 text-amber-700" },
 };
@@ -133,6 +133,17 @@ export function VerdictDisplay({
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
             {meta.sublabel}
           </p>
+
+          {/* The word above is the ANSWER — that is what gold, rose and amber are
+              for. This pill is a different claim: that the answer is signed and can
+              be re-checked later. That is the system attesting to itself, so it
+              takes the verification green instead of repeating the verdict colour. */}
+          {verification.signature && (
+            <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-verify-border bg-verify-soft px-3 py-1 text-[11px] font-semibold text-verify-strong">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              Signed by the network · re-checkable on the receipt
+            </span>
+          )}
 
           {verification.checks.length > 0 && (
             <div className="mt-7 w-full max-w-md text-left">
@@ -203,7 +214,7 @@ export function VerdictDisplay({
 
         <div className="flex flex-col gap-2.5 border-t border-brand-100 bg-white/70 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-gold-strong" />
+            <ShieldCheck className="h-4 w-4 text-brand-500" />
             No name, DOB or NIN was shown to {businessName}.
           </p>
           <div className="flex gap-2.5">

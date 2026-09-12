@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -20,13 +20,11 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { BusinessAvatar, avatarColor, initials } from "@/components/site/business-avatar";
+import { modeFromPath } from "@/components/site/mode-switch";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { StatusDot, grantStatusRank } from "@/components/dashboard/status-badge";
-import { useQueryParam } from "@/components/dashboard/use-query-param";
-import { useApp } from "@/state/app-context";
+import { useApp, type AuthKind } from "@/state/app-context";
 import { cn } from "@/lib/utils";
-import type { GrantStatus } from "@/lib/types";
 
 type NavItem = { href: string; label: string; icon: typeof Building2 };
 
@@ -57,226 +55,203 @@ const TITLES: Record<string, string> = {
   "/business/verify": "Verify a reference",
 };
 
+function titleFor(pathname: string): string {
+  if (TITLES[pathname]) return TITLES[pathname];
+  // A receipt is not a section of either portal — it opens over whichever one
+  // you verified from — so the bar names it directly instead of falling back to
+  // a generic "portal".
+  if (pathname.startsWith("/receipt")) return "Verification receipt";
+  return "Quebec portal";
+}
+
 function SectionLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
   const Icon = item.icon;
+  // The active section is a STATE, so it is ink. It was gold, which put the
+  // accent on every page's navigation and made "where am I" the same colour as
+  // "the answer is yes".
   return (
     <Link
       href={item.href}
       className={cn(
-        "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
         isActive
-          ? "bg-gold-soft text-af-ink"
+          ? "bg-brand-100 text-brand-950"
           : "text-brand-700 hover:bg-brand-50 hover:text-brand-950"
       )}
     >
       {isActive && (
         <span
           aria-hidden="true"
-          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gold"
+          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-brand-900"
         />
       )}
-      <Icon className={cn("h-4 w-4", isActive ? "text-gold-strong" : "text-brand-400")} />
+      <Icon className={cn("h-4 w-4", isActive ? "text-brand-900" : "text-brand-400")} />
       {item.label}
-    </Link>
-  );
-}
-
-function FilterLink({
-  href,
-  label,
-  active,
-  status,
-}: {
-  href: string;
-  label: string;
-  active: boolean;
-  status?: GrantStatus;
-}) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "flex items-center gap-2 rounded-md py-1.5 pl-[2.35rem] pr-2 text-xs transition-colors",
-        active
-          ? "bg-gold-soft/70 font-medium text-brand-950"
-          : "text-brand-600 hover:bg-brand-50 hover:text-brand-950"
-      )}
-    >
-      {status ? (
-        <StatusDot status={status} />
-      ) : (
-        <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full border border-brand-300" />
-      )}
-      <span className="truncate">{label}</span>
     </Link>
   );
 }
 
 /**
  * Modern portal shell: a fixed sidebar on desktop, a drawer on mobile, and a
- * sticky top bar. The sidebar is the dashboard itself : an identity chip, then
- * a nav whose sections each expand to the entities on that page (third parties
- * on the user side, users on the business side). No portal switch in here.
+ * sticky top bar. The nav is the sections and nothing else : the entity lists
+ * that used to expand under "Third parties" and "Your users" made the sidebar a
+ * second copy of the page it linked to, and pushed the sections themselves off
+ * a 640px-tall screen. Those entities are on their pages, where there is room to
+ * read them. The sidebar footer is who you are and the way out.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { store, activeIdentity, activeGrants, businessesById, signedIn, signOut } = useApp();
+  const { store, activeIdentity, businessesById, signedIn, authKind, signOut } = useApp();
   const router = useRouter();
-  if (!signedIn && typeof window !== "undefined") { router.replace(pathname.startsWith("/business") ? "/auth/business/signin" : "/auth/user/signin"); return null; }
-  const filterB = useQueryParam("b");
-  const filterU = useQueryParam("u");
 
-  const mode = pathname.startsWith("/business") ? "business" : "user";
+  // /user/* and /business/* name their portal outright. Any other route under
+  // this shell — a receipt — belongs to whichever portal the session signed in
+  // to, so it inherits that sidebar rather than guessing from the path.
+  const mode: AuthKind = modeFromPath(pathname) ?? authKind ?? "user";
+
+  // A session only opens the portal it signed in to. Every hook runs before this
+  // return: an earlier version bailed out above the sidebar's own hooks, so the
+  // hook count changed on the signed-out -> signed-in transition.
+  //
+  // The destination is /auth, not /auth/{mode}/signin. Two reasons, and the
+  // second is the load-bearing one: signing out should put you back at the
+  // choice rather than at the form you came in through, AND this effect runs on
+  // the same commit that clears the session — so anything narrower here would
+  // fire straight after sign-out and overwrite the redirect the footer asked
+  // for. One destination means there is no race to lose.
+  const mustSignIn = !signedIn || authKind !== mode;
+  useEffect(() => {
+    if (mustSignIn) router.replace("/auth");
+  }, [mustSignIn, router]);
+  if (mustSignIn) return null;
+
   const sections = mode === "business" ? BUSINESS_SECTIONS : USER_SECTIONS;
-  const title = TITLES[pathname] ?? "Quebec portal";
+  const title = titleFor(pathname);
   const portalLabel = mode === "business" ? "Business" : "User";
 
-  // Third parties for the user sidebar, status-sorted.
-  const parties = activeGrants
-    .map((g) => ({
-      id: g.businessId,
-      name: businessesById[g.businessId]?.name ?? g.businessId,
-      status: g.status,
-    }))
-    .sort((a, b) => grantStatusRank(a.status) - grantStatusRank(b.status) || a.name.localeCompare(b.name));
+  // Who is signed in, as the footer row sees them : an avatar, a name, and the
+  // one line of detail that tells two holders apart. A row, so one line each.
+  const session =
+    mode === "business"
+      ? store && businessesById[store.activeBusinessId]
+        ? (() => {
+            const biz = businessesById[store.activeBusinessId];
+            return {
+              avatar: <BusinessAvatar name={biz.name} seed={biz.id} className="h-9 w-9 text-xs" />,
+              name: biz.name,
+              sub: biz.sector,
+              mono: false,
+            };
+          })()
+        : null
+      : activeIdentity
+        ? {
+            avatar: (
+              <span
+                className={cn(
+                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ring-1",
+                  avatarColor(activeIdentity.id)
+                )}
+              >
+                {initials(activeIdentity.name)}
+              </span>
+            ),
+            name: activeIdentity.name,
+            sub: activeIdentity.uniqueId,
+            mono: true,
+          }
+        : null;
 
-  // Users for the business sidebar, status-sorted.
-  const businessUsers = store
-    ? store.grants
-        .filter((g) => g.businessId === store.activeBusinessId)
-        .map((g) => ({
-          identityId: g.identityId,
-          name: store.identities.find((i) => i.id === g.identityId)?.name ?? g.identityId,
-          status: g.status,
-        }))
-        .sort(
-          (a, b) => grantStatusRank(a.status) - grantStatusRank(b.status) || a.name.localeCompare(b.name)
-        )
-    : [];
-
-  const identityChip =
-    mode === "business" ? (
-      store && businessesById[store.activeBusinessId] ? (
-        (() => {
-          const biz = businessesById[store.activeBusinessId];
-          return (
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-brand-50/60 p-3">
-              <BusinessAvatar name={biz.name} seed={biz.id} className="h-9 w-9 text-xs" />
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-brand-950">{biz.name}</p>
-                <p className="truncate text-xs text-muted-foreground">{biz.sector}</p>
-              </div>
+  const SidebarFooter = (
+    <div className="mt-auto flex flex-col gap-2.5">
+      <div
+        className={cn(
+          "flex items-center gap-2.5 rounded-xl p-2.5",
+          session ? "border border-border bg-brand-50/60" : "border border-dashed border-brand-300"
+        )}
+      >
+        {session ? (
+          <>
+            {session.avatar}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-brand-950">{session.name}</p>
+              <p
+                className={cn(
+                  "truncate text-[11px] text-muted-foreground",
+                  session.mono && "font-mono"
+                )}
+              >
+                {session.sub}
+              </p>
             </div>
-          );
-        })()
-      ) : (
-        <div className="rounded-xl border border-dashed border-brand-200 p-3 text-xs text-muted-foreground">
-          Loading session…
-        </div>
-      )
-    ) : activeIdentity ? (
-      <div className="flex items-center gap-3 rounded-xl border border-border bg-brand-50/60 p-3">
-        <span
-          className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ring-1",
-            avatarColor(activeIdentity.id)
-          )}
-        >
-          {initials(activeIdentity.name)}
-        </span>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-brand-950">{activeIdentity.name}</p>
-          <p className="truncate font-mono text-[11px] text-muted-foreground">
-            {activeIdentity.uniqueId}
+          </>
+        ) : (
+          <p className="min-w-0 flex-1 px-1 text-[11px] leading-snug text-muted-foreground">
+            {mode === "user" ? (
+              <>
+                No reference yet.{" "}
+                <Link
+                  href="/user/enroll"
+                  className="font-medium text-brand-900 underline underline-offset-2 hover:text-brand-950"
+                >
+                  Enroll
+                </Link>{" "}
+                to get one.
+              </>
+            ) : (
+              "Loading session…"
+            )}
           </p>
-        </div>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            signOut();
+            router.push("/auth");
+          }}
+          aria-label="Sign out"
+          title="Sign out"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-brand-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
       </div>
-    ) : (
-      <div className="rounded-xl border border-dashed border-brand-200 p-3 text-xs leading-relaxed text-muted-foreground">
-        No reference yet :{" "}
-        <Link href="/user/enroll" className="font-medium text-gold-strong hover:underline">
-          enroll
-        </Link>{" "}
-        to get one.
-      </div>
-    );
+      {/* Dashed, not tinted : this note is about what is NOT here. See the
+          colour grammar in globals.css. */}
+      <p className="rounded-lg border border-dashed border-brand-300 px-3 py-2 text-[11px] leading-relaxed text-brand-700">
+        Demo session : synthetic identity data. Nothing here is real.
+      </p>
+    </div>
+  );
 
   const SidebarContent = (
-    <div className="flex h-full flex-col gap-5 overflow-y-auto">
+    <div className="flex h-full flex-col gap-6 overflow-y-auto">
       <Logo href="/" />
-      {identityChip}
 
-      <nav aria-label="Portal navigation" className="flex flex-col gap-4">
-        {sections.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <div key={item.href} className="flex flex-col gap-0.5">
-              <SectionLink item={item} isActive={isActive} />
-              {mode === "user" && item.href === "/user/third-parties" && (
-                <div className="mt-1 flex flex-col gap-px">
-                  <FilterLink
-                    href="/user/third-parties"
-                    label="All third parties"
-                    active={pathname === "/user/third-parties" && !filterB}
-                  />
-                  {parties.map((p) => (
-                    <FilterLink
-                      key={p.id}
-                      href={`/user/third-parties?b=${p.id}`}
-                      label={p.name}
-                      status={p.status}
-                      active={filterB === p.id}
-                    />
-                  ))}
-                </div>
-              )}
-              {mode === "business" && item.href === "/business/users" && (
-                <div className="mt-1 flex flex-col gap-px">
-                  <FilterLink
-                    href="/business/users"
-                    label="All users"
-                    active={pathname === "/business/users" && !filterU}
-                  />
-                  {businessUsers.map((u) => (
-                    <FilterLink
-                      key={u.identityId}
-                      href={`/business/users?u=${u.identityId}`}
-                      label={u.name}
-                      status={u.status}
-                      active={filterU === u.identityId}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <nav aria-label="Portal navigation" className="flex flex-col gap-0.5">
+        {sections.map((item) => (
+          <SectionLink key={item.href} item={item} isActive={pathname === item.href} />
+        ))}
 
         <Link
           href="/how-it-works"
-          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:text-brand-950"
+          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-brand-700 transition-colors hover:bg-brand-50 hover:text-brand-950"
         >
           <HelpCircle className="h-4 w-4 text-brand-400" />
           How it works
         </Link>
       </nav>
 
-      <div className="flex-1" />
-      <button type="button" onClick={() => { signOut(); router.push(`/auth/${mode}/signin`); }} className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-brand-700 transition-colors hover:bg-rose-50 hover:text-rose-700">
-        <LogOut className="h-4 w-4" />
-        Sign out
-      </button>
-      <div className="rounded-lg border border-gold-border bg-gold-soft/60 px-3 py-2.5 text-xs leading-relaxed text-brand-800">
-        Demo session : synthetic identity data. Nothing here is real.
-      </div>
+      {SidebarFooter}
     </div>
   );
 
   return (
     <Sheet>
       <div className="min-h-screen bg-background">
-        {/* Desktop sidebar */}
-        <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 overflow-hidden border-r border-border bg-white p-5 lg:block">
+        {/* Desktop sidebar. no-print, like the old site header it replaces : a
+            receipt prints on its own, not with the portal wrapped around it. */}
+        <aside className="no-print fixed inset-y-0 left-0 z-40 hidden w-64 overflow-hidden border-r border-border bg-white p-5 lg:block">
           {SidebarContent}
         </aside>
 
@@ -286,10 +261,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="h-full p-5">{SidebarContent}</div>
         </SheetContent>
 
-        {/* Main column */}
-        <div className="lg:pl-64">
+        {/* Main column : print:pl-0 because the sidebar is hidden on paper. */}
+        <div className="lg:pl-64 print:pl-0">
           {/* Sticky top bar */}
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur sm:px-6">
+          <header className="no-print sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur sm:px-6">
             <SheetTrigger asChild>
               <button
                 type="button"
@@ -299,9 +274,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Menu className="h-5 w-5" />
               </button>
             </SheetTrigger>
-            <h1 className="font-display text-lg font-bold tracking-tight text-brand-950">{title}</h1>
+            <h1 className="font-display text-[17px] font-bold tracking-[-0.02em] text-brand-950">{title}</h1>
             <Badge variant="outline" className="ml-auto hidden gap-1.5 sm:inline-flex">
-              <ShieldCheck className="h-3 w-3 text-gold-strong" />
+              <ShieldCheck className="h-3 w-3 text-brand-500" />
               {portalLabel} portal
             </Badge>
             <Link
@@ -313,7 +288,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           </header>
 
-          <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+          {/* py-14, up from py-10: the landing runs py-24 between sections. The
+              portal should not match that — it is a tool, not a brochure — but it
+              was packed tight enough that nothing had room to read as important. */}
+          <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">{children}</main>
         </div>
       </div>
     </Sheet>

@@ -26,7 +26,14 @@ const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("font-semibold leading-none tracking-tight text-brand-950", className)}
+      // font-display + the landing's negative tracking. Card titles carried the
+      // neutral sans at `tracking-tight`, which is the single most generic
+      // combination available; the display face at this size is what makes an
+      // otherwise ordinary card read as this product's card.
+      className={cn(
+        "font-display font-bold leading-none tracking-[-0.02em] text-brand-950",
+        className
+      )}
       {...props}
     />
   )

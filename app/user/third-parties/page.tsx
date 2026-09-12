@@ -33,7 +33,7 @@ export default function ThirdPartiesPage() {
       <Card>
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-gold-strong" />
+            <Building2 className="h-5 w-5 text-brand-400" />
             Access
           </CardTitle>
           <CardDescription>
@@ -47,7 +47,7 @@ export default function ThirdPartiesPage() {
       </Card>
 
       <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-        <ShieldCheck className="h-3.5 w-3.5 text-gold-strong" />
+        <ShieldCheck className="h-3.5 w-3.5 text-brand-400" />
         Every action above is a real event in this demo&apos;s audit trail: no data behind the scenes.
       </p>
     </AppShell>

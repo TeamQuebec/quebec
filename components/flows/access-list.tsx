@@ -56,7 +56,7 @@ export function AccessList() {
             <div className="min-w-0">
               <p className="flex items-center gap-2 truncate font-medium text-brand-950">
                 {biz.name}
-                <Badge variant="accent" className="hidden sm:inline-flex">
+                <Badge variant="secondary" className="hidden sm:inline-flex">
                   <ShieldCheck className="h-3 w-3" />
                   Can verify
                 </Badge>

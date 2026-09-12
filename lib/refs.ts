@@ -29,9 +29,10 @@ export function normalizeReference(raw: string): string {
 }
 
 /**
- * Deterministic 64-hex pseudo-hash (cyrb53-style, x2) used to make receipts
- * look tamper-evident. NOT cryptographic — Phase 2 replaces this with a real
- * signed digest from the backend.
+ * Deterministic 64-hex pseudo-hash (cyrb53-style, x2). Receipts are signed with
+ * real ECDSA (lib/vault.ts) and only fall back to this if the vault is
+ * unavailable — in which case the receipt is stored unsigned and says so rather
+ * than passing this off as a signature.
  */
 export function pseudoHash(input: string): string {
   let h1 = 0xdeadbeef ^ input.length;

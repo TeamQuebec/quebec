@@ -28,7 +28,7 @@ import { CopyButton } from "@/components/site/copy-button";
 import { BusinessAvatar } from "@/components/site/business-avatar";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { KpiCard } from "@/components/dashboard/kpi-card";
+import { StatStrip } from "@/components/dashboard/stat-strip";
 import { ActivityChart, buildActivityPoints } from "@/components/dashboard/activity-chart";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { GrantStatusBadge, grantStatusRank } from "@/components/dashboard/status-badge";
@@ -45,13 +45,8 @@ export default function DashboardPage() {
       <AppShell>
         <div className="space-y-6">
           <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-32 w-full rounded-xl" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Skeleton className="h-28 w-full rounded-xl" />
-            <Skeleton className="h-28 w-full rounded-xl" />
-            <Skeleton className="h-28 w-full rounded-xl" />
-            <Skeleton className="h-28 w-full rounded-xl" />
-          </div>
+          <Skeleton className="h-44 w-full rounded-xl" />
+          <Skeleton className="h-36 w-full rounded-xl" />
           <Skeleton className="h-64 w-full rounded-xl" />
         </div>
       </AppShell>
@@ -63,8 +58,8 @@ export default function DashboardPage() {
     return (
       <AppShell>
         <div className="mx-auto max-w-xl py-12 text-center sm:py-16">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gold-soft">
-            <Fingerprint className="h-7 w-7 text-gold-strong" />
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100">
+            <Fingerprint className="h-7 w-7 text-brand-600" />
           </span>
           <h1 className="mt-5 font-display text-2xl font-bold tracking-tight text-brand-950">
             You don&apos;t have a reference yet
@@ -135,7 +130,7 @@ export default function DashboardPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Badge variant={verified ? "accent" : "muted"} className="hidden gap-1 sm:inline-flex">
+            <Badge variant={verified ? "success" : "muted"} className="hidden gap-1 sm:inline-flex">
               {verified ? (
                 <>
                   <BadgeCheck className="h-3 w-3" />
@@ -158,81 +153,97 @@ export default function DashboardPage() {
         }
       />
 
-      {/* Reference card */}
-      <Card className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-brand-700 via-brand-500 to-gold" />
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <span className="hidden h-12 w-12 items-center justify-center rounded-xl bg-gold-soft text-gold-strong sm:flex">
-                <Fingerprint className="h-6 w-6" />
-              </span>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-400">
-                  Your Quebec reference
-                </p>
-                <p className="ref-plate mt-1 text-2xl font-semibold text-brand-950 sm:text-3xl">
-                  {activeIdentity.uniqueId}
-                </p>
-              </div>
+      {/* Reference plate — the hero object.
+          The reference is the entire product in one string: it is the only thing
+          the holder ever hands over, and the only thing a business ever keeps.
+          It was rendered as an ordinary white Card with the value sitting under a
+          10px eyebrow and a tinted fingerprint chip beside it — the most
+          important object on the page set as the least important thing on it.
+          It is a dark plate now, because a vault artifact should look like one,
+          and because the portal had no dark moment anywhere: every surface was
+          white on white, which is most of why it read as flat. Echoes the
+          receipt's dark header band, so the two artifacts match. */}
+      <section className="relative overflow-hidden rounded-xl bg-brand-900 p-6 sm:p-8">
+        <div className="bg-grid-light absolute inset-0" aria-hidden="true" />
+        <div className="relative">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/60">
+                {/* Gold, doing its actual job: marking the thing that is present
+                    and was issued by the vault. */}
+                <span className="h-1.5 w-1.5 rounded-full bg-af-accent" aria-hidden="true" />
+                Your Quebec reference
+              </p>
+              {/* ref-plate already sets the mono family and 0.08em tracking —
+                  which is right for a credential, and is what the landing's
+                  LiveVerify uses. So no font-display and no tracking utility
+                  here: both would fight ref-plate and the winner would come down
+                  to cascade order. Size and weight only. */}
+              <p className="ref-plate mt-4 break-all text-[clamp(1.4rem,3.4vw,2rem)] font-bold leading-none text-white">
+                {activeIdentity.uniqueId}
+              </p>
+              <p className="mt-5 max-w-[560px] text-[13px] leading-relaxed text-white/70">
+                This is the <span className="font-semibold text-white">only</span> thing you share.
+                Businesses use it to verify facts about you: they never see your name, date of birth
+                or NIN. You can revoke their access at any time.
+              </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
               <CopyButton text={activeIdentity.uniqueId} />
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/user/profile">
-                  View record
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
+              <Link
+                href="/user/profile"
+                className="inline-flex items-center gap-1.5 rounded-[7px] border border-white/30 bg-white/10 px-[18px] py-[11px] text-[14px] font-semibold text-white transition-colors hover:bg-white/20"
+              >
+                View record
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
             </div>
           </div>
-          <p className="mt-4 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-            This is the <span className="font-semibold text-brand-800">only</span> thing you
-            share. Businesses use it to verify facts about you: they never see your name, date
-            of birth or NIN. You can revoke their access at any time below.
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      {/* KPI row */}
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label="Current"
-          value={current}
-          hint="can verify facts now"
-          icon={KeyRound}
-          tone="gold"
-        />
-        <KpiCard
-          label="Pending"
-          value={pending}
-          hint="awaiting your approval"
-          icon={Hourglass}
-          tone="amber"
-        />
-        <KpiCard
-          label="Revoked"
-          value={revoked}
-          hint="no longer have access"
-          icon={Ban}
-          tone="rose"
-        />
-        <KpiCard
-          label="Total checks"
-          value={checksTotal}
-          hint="signed verifications to date"
-          icon={ShieldCheck}
-          tone="brand"
-        />
-      </div>
+      {/* Metric strip */}
+      <StatStrip
+        className="mt-8"
+        stats={[
+          {
+            label: "Current",
+            value: current,
+            hint: "can verify facts now",
+            icon: KeyRound,
+            tone: "neutral",
+          },
+          {
+            label: "Pending",
+            value: pending,
+            hint: "awaiting your approval",
+            icon: Hourglass,
+            tone: "amber",
+          },
+          {
+            label: "Revoked",
+            value: revoked,
+            hint: "no longer have access",
+            icon: Ban,
+            tone: "rose",
+          },
+          {
+            label: "Total checks",
+            value: checksTotal,
+            hint: "signed verifications to date",
+            icon: ShieldCheck,
+            tone: "neutral",
+          },
+        ]}
+      />
 
       {/* Chart + recent activity + third-party snapshot */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
-                <ShieldCheck className="h-4 w-4 text-gold-strong" />
+                <ShieldCheck className="h-4 w-4 text-brand-400" />
                 Checks this week
               </CardTitle>
               <CardDescription>
@@ -247,7 +258,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Building2 className="h-4 w-4 text-gold-strong" />
+                <Building2 className="h-4 w-4 text-brand-400" />
                 Recent activity
               </CardTitle>
               <CardDescription>The latest checks and permission changes on your record.</CardDescription>
@@ -261,7 +272,7 @@ export default function DashboardPage() {
               <div className="mt-4 border-t border-border pt-3">
                 <Link
                   href="/user/activity"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-gold-strong hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-brand-900 hover:underline"
                 >
                   View full activity
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -275,7 +286,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
-                <KeyRound className="h-4 w-4 text-gold-strong" />
+                <KeyRound className="h-4 w-4 text-brand-400" />
                 Third parties
               </CardTitle>
               <CardDescription>Who currently holds access to your reference.</CardDescription>
@@ -306,7 +317,7 @@ export default function DashboardPage() {
               <div className="mt-4 border-t border-border pt-3">
                 <Link
                   href="/user/third-parties"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-gold-strong hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-brand-900 hover:underline"
                 >
                   Manage all ({activeGrants.length})
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -316,7 +327,7 @@ export default function DashboardPage() {
           </Card>
 
           <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="h-3.5 w-3.5 text-gold-strong" />
+            <ShieldCheck className="h-3.5 w-3.5 text-brand-400" />
             Every action above is a real event in this demo&apos;s audit trail.
           </p>
         </div>

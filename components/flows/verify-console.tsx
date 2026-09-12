@@ -37,8 +37,10 @@ function StepBadge({ n, active, done, label }: { n: string; active: boolean; don
       <span
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors",
+          // Green for a completed step: the system finished its job. The verdict
+          // that comes out of it is a separate axis and stays gold or rose.
           done
-            ? "bg-gold text-af-ink"
+            ? "bg-verify text-white"
             : active
               ? "bg-brand-800 text-white"
               : "border border-brand-200 bg-white text-brand-400"
@@ -55,7 +57,7 @@ function StepBadge({ n, active, done, label }: { n: string; active: boolean; don
 
 /** Answer chips shown as each check completes during the verification sequence. */
 const ANSWER_CHIP: Record<CheckAnswer, { label: string; cls: string }> = {
-  yes: { label: "YES", cls: "border-gold-border bg-gold-soft text-gold-deep" },
+  yes: { label: "YES", cls: "border-gold-border bg-gold-soft text-gold-strong" },
   no: { label: "NO", cls: "border-rose-200 bg-rose-50 text-rose-700" },
   unable: { label: "UNABLE", cls: "border-amber-200 bg-amber-50 text-amber-700" },
 };
@@ -102,12 +104,11 @@ function VerificationSequence({
 
   return (
     <div className="animate-fade-in overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-      <div className="h-1.5 bg-gradient-to-r from-brand-700 to-gold" />
       <div className="p-6 sm:p-8">
         {/* Reference scan plate */}
         <div className="relative h-24 overflow-hidden rounded-xl border border-brand-200 bg-brand-950 px-4">
           <div className="flex h-full flex-col items-center justify-center gap-1.5">
-            <p className="ref-plate text-lg font-semibold tracking-widest text-white">{reference}</p>
+            <p className="ref-plate text-lg font-semibold text-white">{reference}</p>
             <p className="text-[11px] text-brand-200">
               {stage === "scanning"
                 ? "Scanning reference…"
@@ -139,7 +140,7 @@ function VerificationSequence({
                     {ANSWER_CHIP[answer].label}
                   </Badge>
                 ) : isDone ? (
-                  <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-gold-strong">
+                  <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-verify">
                     <Check className="h-4 w-4" />
                     Done
                   </span>
@@ -157,7 +158,7 @@ function VerificationSequence({
         </div>
 
         <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-          <Lock className="h-3.5 w-3.5 shrink-0 text-gold-strong" />
+          <Lock className="h-3.5 w-3.5 shrink-0 text-brand-400" />
           Only these facts are answered : nothing else from the record is touched.
         </p>
       </div>
@@ -254,8 +255,7 @@ export function VerifyConsole() {
           onComplete={handleSequenceComplete}
         />
       ) : (
-        <Card className="overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-brand-700 to-gold" />
+        <Card>
           <CardContent className="p-6 sm:p-8">
             {/* Step 1 : reference */}
             <label htmlFor="qbc-ref" className="block">
@@ -272,7 +272,7 @@ export function VerifyConsole() {
                 value={reference}
                 onChange={(e) => setReference(e.target.value.toUpperCase())}
                 placeholder="e.g. QBC-8X92-1F"
-                className="ref-plate h-14 pl-12 pr-4 text-lg font-semibold tracking-widest"
+                className="ref-plate h-14 pl-12 pr-4 text-lg font-semibold"
                 aria-describedby="qbc-ref-hint"
               />
             </div>
@@ -293,7 +293,7 @@ export function VerifyConsole() {
                   onClick={() => setReference(c.ref)}
                   className={cn(
                     "ref-plate inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors",
-                    c.tone === "yes" && "border-gold-border bg-gold-soft text-gold-deep hover:border-gold-strong/40",
+                    c.tone === "yes" && "border-gold-border bg-gold-soft text-gold-strong hover:border-gold-strong/40",
                     c.tone === "no" && "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
                     c.tone === "none" && "border-brand-200 bg-white text-brand-600 hover:bg-brand-50"
                   )}
@@ -321,9 +321,11 @@ export function VerifyConsole() {
                       onClick={() => toggleCheck(c.id)}
                       aria-pressed={checked}
                       className={cn(
-                        "flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-all",
+                        "flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        // Selected is a state, so it is ink. Gold here meant a
+                        // ticked fact card and a YES answer were one colour.
                         checked
-                          ? "border-gold bg-gold-soft/60 shadow-sm"
+                          ? "border-brand-800 bg-brand-50 shadow-sm"
                           : "border-border bg-white hover:border-brand-200 hover:bg-brand-50/40"
                       )}
                     >
@@ -346,39 +348,47 @@ export function VerifyConsole() {
               </div>
             </div>
 
-            {/* Step 3 : verify */}
-            <Button
-              size="xl"
-              variant="brand"
-              className="mt-7 w-full text-base font-semibold"
-              disabled={!canVerify}
-              onClick={runVerify}
-            >
-              {verifying ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Verifying…
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="h-5 w-5" />
-                  Verify
-                </>
-              )}
-            </Button>
+            {/* Step 3 : verify. Pinned to the bottom of the card so the primary
+                action stays on screen while you work through the facts above it,
+                and it carries the count so you can see what you are about to ask
+                for without scrolling back up. */}
+            <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-8 rounded-b-xl border-t border-border bg-white/95 px-6 pb-5 pt-4 backdrop-blur sm:-mx-8 sm:-mb-8 sm:px-8">
+              <Button
+                size="xl"
+                variant="brand"
+                className="w-full text-base font-semibold"
+                disabled={!canVerify}
+                onClick={runVerify}
+              >
+                {verifying ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Verifying…
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="h-5 w-5" />
+                    {selected.length > 0
+                      ? `Verify ${selected.length} ${selected.length === 1 ? "fact" : "facts"}`
+                      : "Verify"}
+                  </>
+                )}
+              </Button>
 
-            <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-              <Fingerprint className="h-3.5 w-3.5 text-brand-400" />
-              You&apos;ll receive only a signed YES / NO and a receipt : never the underlying record.
-            </p>
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+                <Fingerprint className="h-3.5 w-3.5 shrink-0 text-brand-400" />
+                You&apos;ll receive only a signed YES / NO and a receipt : never the underlying
+                record.
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-        <Sparkles className="h-3.5 w-3.5 text-gold-strong" />
+        <Sparkles className="h-3.5 w-3.5 text-brand-400" />
         Why trust the answer? Every result is signed, timestamped and re-checkable on the receipt.
-        <Link href="/how-it-works" className="font-medium text-gold-strong hover:underline">
+        <Link href="/how-it-works" className="font-medium text-brand-900 underline underline-offset-2 hover:text-brand-950">
           See how it works
         </Link>
       </p>

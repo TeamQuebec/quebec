@@ -1,9 +1,12 @@
 import { cn } from "@/lib/utils";
 
+// Decorative identity colours, used only so two names never look alike. Gold is
+// deliberately absent: these chips appear on every row of every table, and the
+// accent is not available to be "a colour a name might get".
 const PALETTE = [
-  "bg-gold-soft text-gold-strong ring-gold-border",
+  "bg-teal-50 text-teal-700 ring-teal-100",
   "bg-brand-50 text-brand-700 ring-brand-100",
-  "bg-gold-soft text-gold-strong ring-gold-border",
+  "bg-indigo-50 text-indigo-700 ring-indigo-100",
   "bg-violet-50 text-violet-700 ring-violet-100",
   "bg-amber-50 text-amber-700 ring-amber-100",
   "bg-rose-50 text-rose-700 ring-rose-100",

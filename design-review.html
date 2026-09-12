@@ -1,0 +1,881 @@
+<title>Quebec Design Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  /* ---------------------------------------------------------------
+     Chrome tokens. The page is a colour instrument, so its own shell
+     is deliberately neutral and very slightly COOL — it must not
+     pre-bias the warm palettes it is showing.
+     --------------------------------------------------------------- */
+  :root {
+    --ground: #fbfbfc;
+    --surface: #ffffff;
+    --surface-2: #f4f5f7;
+    --chip: #eceef1;
+    --ink: #14161a;
+    --ink-2: #4a4f57;
+    --ink-3: #7d838d;
+    --line: #e4e6ea;
+    --line-2: #d3d7dd;
+
+    /* Semantic data colours — separate from any palette under test. */
+    --ok: #14724a;
+    --ok-bg: #e6f4ec;
+    --warn: #8a5a06;
+    --warn-bg: #fdf1dc;
+    --bad: #a4231c;
+    --bad-bg: #fceceb;
+
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(20, 22, 26, .05), 0 8px 24px -12px rgba(20, 22, 26, .14);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0f1013;
+      --surface: #17191d;
+      --surface-2: #1e2025;
+      --chip: #23262b;
+      --ink: #ecedef;
+      --ink-2: #a8adb6;
+      --ink-3: #7b818b;
+      --line: #2a2d33;
+      --line-2: #383c44;
+      --ok: #4ec98a;
+      --ok-bg: #12301f;
+      --warn: #e0b154;
+      --warn-bg: #33260e;
+      --bad: #f2857c;
+      --bad-bg: #341714;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0f1013;
+    --surface: #17191d;
+    --surface-2: #1e2025;
+    --chip: #23262b;
+    --ink: #ecedef;
+    --ink-2: #a8adb6;
+    --ink-3: #7b818b;
+    --line: #2a2d33;
+    --line-2: #383c44;
+    --ok: #4ec98a;
+    --ok-bg: #12301f;
+    --warn: #e0b154;
+    --warn-bg: #33260e;
+    --bad: #f2857c;
+    --bad-bg: #341714;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-block: 0 96px;
+    padding-inline: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .mono {
+    font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: .82em;
+    letter-spacing: -.01em;
+  }
+
+  h1, h2, h3 {
+    font-family: "Newsreader", ui-serif, Georgia, serif;
+    font-weight: 500;
+    text-wrap: balance;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    padding-block: 72px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  h1 { font-size: clamp(2.1rem, 5vw, 3.1rem); line-height: 1.06; }
+  .standfirst {
+    max-width: 62ch;
+    color: var(--ink-2);
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- generic section ---------- */
+  section { display: flex; flex-direction: column; gap: 24px; }
+  .sec-head { display: flex; flex-direction: column; gap: 8px; }
+  .sec-head h2 { font-size: 1.65rem; }
+  .sec-head p { margin: 0; max-width: 68ch; color: var(--ink-2); }
+
+  /* ---------- findings ---------- */
+  .findings { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+  .finding {
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    gap: 20px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .finding h3 { font-size: 1.05rem; font-family: "Public Sans", sans-serif; font-weight: 600; letter-spacing: 0; }
+  .finding p { margin: 6px 0 0; color: var(--ink-2); font-size: .92rem; }
+  .finding .ev {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: baseline;
+    color: var(--ink-3);
+    font-size: .82rem;
+  }
+  .finding .ev b { color: var(--ink-2); font-weight: 500; }
+
+  .sev {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .sev.bad { background: var(--bad-bg); color: var(--bad); }
+  .sev.warn { background: var(--warn-bg); color: var(--warn); }
+
+  /* ---------- direction picker ---------- */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tab {
+    appearance: none;
+    cursor: pointer;
+    font: inherit;
+    font-size: .92rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 100px;
+    padding: 9px 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .tab:hover { border-color: var(--ink-3); color: var(--ink); }
+  .tab[aria-selected="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--ground);
+  }
+  .tab:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .tab .dot { width: 9px; height: 9px; border-radius: 100px; flex: none; }
+
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .panel { grid-template-columns: 1fr; } }
+
+  /* the live specimen */
+  .specimen {
+    background: var(--d-ground);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: var(--shadow);
+  }
+  .spec-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--d-ink-3);
+  }
+  .card {
+    background: var(--d-surface);
+    border: 1px solid var(--d-line);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .idchip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--d-chip);
+    border: 1px solid var(--d-line);
+    border-radius: 10px;
+    padding: 9px 11px;
+  }
+  .avatar {
+    width: 32px; height: 32px; flex: none;
+    border-radius: 100px;
+    background: var(--d-ink);
+    color: var(--d-ground);
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .idchip .nm { font-size: .84rem; font-weight: 600; color: var(--d-ink); line-height: 1.3; }
+  .idchip .rf { font-size: .72rem; color: var(--d-ink-3); line-height: 1.3; }
+
+  .navrow {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 10px; border-radius: 8px;
+    font-size: .84rem; font-weight: 500;
+    color: var(--d-ink-2);
+  }
+  .navrow.active {
+    background: var(--d-active-bg);
+    color: var(--d-ink);
+    position: relative;
+  }
+  .navrow.active::before {
+    content: ""; position: absolute; left: 0; top: 50%;
+    width: 2px; height: 15px; transform: translateY(-50%);
+    border-radius: 2px; background: var(--d-accent);
+  }
+  .navrow .ico { width: 14px; height: 14px; flex: none; opacity: .55; }
+
+  .btnrow { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+  .btn {
+    font-size: .84rem; font-weight: 600;
+    border-radius: 8px; padding: 9px 15px;
+    border: 1px solid transparent;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn.primary {
+    background: linear-gradient(180deg, var(--d-700) 0%, var(--d-900) 100%);
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.18);
+  }
+  .btn.ghost { background: var(--d-surface); border-color: var(--d-line-2); color: var(--d-ink-2); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font-size: .7rem; font-weight: 700; letter-spacing: .06em;
+    padding: 3px 9px; border-radius: 6px; border: 1px solid;
+  }
+  .chip.yes { background: var(--d-accent-soft); border-color: var(--d-accent-border); color: var(--d-accent-ink); }
+  .chip.no { background: #fdf0ef; border-color: #f6cfcc; color: #a4231c; }
+  .chip.unable { background: #fdf4e6; border-color: #f0dcb8; color: #8a5a06; }
+  :root[data-theme="dark"] .chip.no { background: #341714; border-color: #5a2723; color: #f2857c; }
+  :root[data-theme="dark"] .chip.unable { background: #33260e; border-color: #57431a; color: #e0b154; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .chip.no { background: #341714; border-color: #5a2723; color: #f2857c; }
+    :root:not([data-theme="light"]) .chip.unable { background: #33260e; border-color: #57431a; color: #e0b154; }
+  }
+
+  .band {
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #fff;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .band .t { font-size: .82rem; font-weight: 600; }
+  .band .s { font-size: .68rem; opacity: .72; letter-spacing: .1em; text-transform: uppercase; }
+
+  .focusdemo {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .focusdemo .fake-input {
+    background: var(--d-surface);
+    border: 1px solid var(--d-line-2);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: .84rem;
+    color: var(--d-ink);
+    outline: 2px solid var(--d-ring);
+    outline-offset: 2px;
+  }
+  .focusdemo .note { font-size: .72rem; color: var(--d-ink-3); }
+
+  /* ---------- ramp ---------- */
+  .ramp { display: flex; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+  .ramp .sw { flex: 1; height: 52px; }
+  .ramp-labels {
+    display: flex; margin-top: 5px;
+  }
+  .ramp-labels span {
+    flex: 1; text-align: center; font-size: 9px; color: var(--ink-3);
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  /* ---------- measurements ---------- */
+  .measures { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+  .measure {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+    padding-block: 11px;
+    border-bottom: 1px solid var(--line);
+  }
+  .measure .lbl { font-size: .88rem; color: var(--ink-2); }
+  .measure .lbl b { color: var(--ink); font-weight: 500; display: block; }
+  .measure .lbl code { font-size: .76rem; color: var(--ink-3); }
+  .measure .val { display: flex; align-items: baseline; gap: 9px; white-space: nowrap; }
+  .measure .num { font-family: "JetBrains Mono", monospace; font-size: .84rem; font-weight: 500; }
+  .measure .num.pass { color: var(--ok); }
+  .measure .num.fail { color: var(--bad); }
+  .measure .flag {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    padding: 2px 7px; border-radius: 4px;
+  }
+  .measure .flag.pass { background: var(--ok-bg); color: var(--ok); }
+  .measure .flag.fail { background: var(--bad-bg); color: var(--bad); }
+
+  .dnote {
+    margin: 0;
+    font-size: .9rem;
+    color: var(--ink-2);
+    border-left: 2px solid var(--line-2);
+    padding-left: 14px;
+  }
+  .dnote b { color: var(--ink); font-weight: 600; }
+
+  .verdict-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+  }
+  .verdict-bar .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px;
+    background: var(--ink); color: var(--ground);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .verdict-bar .tag .gd { width: 7px; height: 7px; border-radius: 100px; background: #f4c542; }
+  .verdict-bar p { margin: 0; font-size: .9rem; color: var(--ink-2); flex: 1 1 320px; }
+
+  /* ---------- ux list ---------- */
+  .ux { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+  .ux-item {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 16px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .ux-item .rank {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .82rem;
+    color: var(--ink-3);
+    padding-top: 3px;
+  }
+  .ux-item h3 { font-family: "Public Sans", sans-serif; font-size: 1.02rem; font-weight: 600; letter-spacing: 0; }
+  .ux-item p { margin: 6px 0 0; color: var(--ink-2); font-size: .93rem; }
+  .ux-item .fix {
+    margin-top: 9px;
+    font-size: .87rem;
+    color: var(--ink-2);
+  }
+  .ux-item .fix b { color: var(--ink); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    color: var(--ink-3);
+    font-size: .82rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding-inline: 18px; }
+    .finding { grid-template-columns: 1fr; gap: 10px; }
+    .ux-item { grid-template-columns: 26px 1fr; gap: 10px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Quebec · ICSC 2026 Track B · design review</p>
+    <h1>Your palette is better than you think. It just isn't enforced.</h1>
+    <p class="standfirst">
+      I read the token file and every component that consumes it. The gold-on-near-black identity is
+      distinctive and worth keeping — most identity products in this track will be blue, and a judge who
+      has seen thirty of them will remember yours. <strong>The problem is not the hue. It is that six
+      specific things in the system do not do what the names say they do</strong>, and three of them are
+      measurable accessibility failures.
+    </p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <h2>What I measured</h2>
+      <p>Every number below is computed from the hex values in <span class="mono">app/globals.css</span> with the
+        WCAG 2.1 relative-luminance formula, not estimated. Thresholds: 4.5:1 for body text, 3:1 for large
+        text and for non-text UI such as focus rings.</p>
+    </div>
+
+    <div class="findings">
+      <div class="finding">
+        <span class="sev bad">Breaks</span>
+        <div>
+          <h3>The focus ring is invisible</h3>
+          <p><span class="mono">--ring: #dcc76a</span> against the white card it sits on measures
+            <b>1.69:1</b>. Non-text contrast needs 3:1 minimum. Every keyboard user in your demo —
+            and a judge tabbing through the verify form will be one — cannot see where they are.</p>
+          <div class="ev"><b>globals.css:27</b> <span>1.69:1</span> <span>needs ≥ 3:1</span></div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev bad">Breaks</span>
+        <div>
+          <h3>The brand ramp collapses to a single colour</h3>
+          <p><span class="mono">brand-800</span>, <span class="mono">brand-900</span> and
+            <span class="mono">brand-950</span> are all <span class="mono">#171717</span>. So every
+            "gradient" built from them is a flat black fill — the receipt header band, the
+            how-it-works panel, the verify console plate. The system looks like it has a ramp and
+            doesn't.</p>
+          <div class="ev"><b>globals.css:94–96</b> <span>ΔE between stops: 0</span>
+            <span>receipt-view.tsx:88</span> <span>how-it-works:295</span></div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev warn">Misses AA</span>
+        <div>
+          <h3>Accent text fails on small type</h3>
+          <p><span class="mono">text-gold-strong</span> (<span class="mono">#a5760a</span>) measures
+            <b>4.04:1</b> on white and <b>3.66:1</b> on its own <span class="mono">gold-soft</span> fill.
+            It is used at <span class="mono">text-xs</span> for the "Done" tick and the "See how it works"
+            link. <span class="mono">gold-deep</span> (<span class="mono">#8a6300</span>) already exists
+            in the same file and passes at <b>4.92:1</b> — the fix is one token.</p>
+          <div class="ev"><b>verify-console.tsx:142,381</b> <span>4.04:1 / 3.66:1</span></div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev warn">Incoherent</span>
+        <div>
+          <h3>A cool grey lives in a warm system</h3>
+          <p>The <span class="mono">no_match</span> verdict is the only place in the app that reaches for
+            Tailwind's <span class="mono">slate</span> family — <span class="mono">#f8fafc</span>,
+            <span class="mono">#f1f5f9</span>, <span class="mono">#64748b</span>. Those are blue-greys
+            sitting on a yellow-biased off-white. Nobody will name it, but it reads as slightly dirty.</p>
+          <div class="ev"><b>verdict-display.tsx:95–98</b> <b>receipt-view.tsx:43</b></div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev warn">Incoherent</span>
+        <div>
+          <h3>Two leftovers from a palette that no longer exists</h3>
+          <p>The hero grid is drawn with <span class="mono">#1a2f47</span> — a navy. And the entire
+            landing page reads tokens named <span class="mono">--af-*</span>, from the template it was
+            adapted from. Neither is visible as a bug; both are the kind of thing that makes a system
+            feel like it drifted.</p>
+          <div class="ev"><b>globals.css:205–206</b> <b>globals.css:36–49</b></div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="sev warn">Incoherent</span>
+        <div>
+          <h3>Emerald appears exactly once</h3>
+          <p>"Signature valid" on the receipt is the only <span class="mono">emerald-*</span> in the
+            codebase. Every other positive state speaks gold. Either a valid signature is a different
+            kind of good — in which case it deserves a rule — or it is noise.</p>
+          <div class="ev"><b>receipt-view.tsx:300</b> <span>1 occurrence</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Three directions</h2>
+      <p>Each one fixes the six findings above. What separates them is how much of your existing
+        identity they risk. Pick one and the specimen and the measured column update — the numbers are
+        computed live, so you can check my arithmetic rather than trust it.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Brand direction">
+      <button class="tab" role="tab" aria-selected="true" data-dir="a">
+        <span class="dot" style="background:#f4c542"></span> Warm Hallmark
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-dir="b">
+        <span class="dot" style="background:#1d4534"></span> Deep Green Trust
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-dir="c">
+        <span class="dot" style="background:#312e81"></span> Institutional Indigo
+      </button>
+    </div>
+
+    <div class="panel">
+      <div class="specimen" id="specimen">
+        <span class="spec-label">Specimen · business portal</span>
+
+        <div class="card">
+          <div class="idchip">
+            <span class="avatar">AO</span>
+            <span>
+              <span class="nm">Adaeze Okafor</span><br>
+              <span class="rf mono" data-ref>QBC-8X92-1F</span>
+            </span>
+          </div>
+
+          <div class="navrow active">
+            <span class="ico">▤</span> Overview
+          </div>
+          <div class="navrow"><span class="ico">▤</span> Your users</div>
+
+          <div class="btnrow">
+            <span class="btn primary">Verify a reference</span>
+            <span class="btn ghost">Cancel</span>
+          </div>
+
+          <div class="chips">
+            <span class="chip yes">YES</span>
+            <span class="chip no">NO</span>
+            <span class="chip unable">UNABLE</span>
+          </div>
+        </div>
+
+        <div class="band" id="band">
+          <span>
+            <span class="t">Verification Receipt</span><br>
+            <span class="s">Quebec Identity Network</span>
+          </span>
+          <span class="chip yes" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">Signed</span>
+        </div>
+
+        <div class="focusdemo">
+          <div class="fake-input">QBC-8X92-1F</div>
+          <span class="note">Keyboard focus, at true contrast</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="ramp" id="ramp"></div>
+        <div class="ramp-labels" id="rampLabels"></div>
+
+        <div class="measures" id="measures" style="margin-top:22px"></div>
+
+        <p class="dnote" id="dnote" style="margin-top:20px"></p>
+      </div>
+    </div>
+
+    <div class="verdict-bar">
+      <span class="tag" id="recTag"><span class="gd"></span> Recommended</span>
+      <p id="recCopy"></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>The rest of the score</h2>
+      <p>Colour is maybe a third of a UI/UX mark. These are the things I found reading the flow, ranked
+        by how much they cost you.</p>
+    </div>
+
+    <div class="ux">
+      <div class="ux-item">
+        <span class="rank">01</span>
+        <div>
+          <h3>The verify button sits below the fold on the one screen that is the product</h3>
+          <p>Before the primary action there is a context banner, three step badges, the reference
+            field with two lines of hint and three example chips, a divider, a section header, and a
+            two-column grid of four selectable checks. On a laptop viewport the button lands under
+            roughly 700px of content. A judge handed a laptop has to scroll to discover the demo's
+            main action.</p>
+          <p class="fix"><b>Fix:</b> make the action bar sticky to the bottom of the card once a
+            reference and one check are present, and show the running selection in it —
+            <span class="mono">Verify 2 facts</span>. That also removes the toast you currently fire
+            when someone presses Verify with nothing selected.</p>
+        </div>
+      </div>
+
+      <div class="ux-item">
+        <span class="rank">02</span>
+        <div>
+          <h3>The landing page and the portal look like two products</h3>
+          <p>The landing page runs on <span class="mono">--af-*</span> tokens with a near-black hero;
+            the portals run on <span class="mono">brand-*</span> and <span class="mono">gold-*</span>.
+            A judge who lands, reads, then enters the portal experiences a seam exactly where you want
+            confidence to be highest.</p>
+          <p class="fix"><b>Fix:</b> collapse the two token sets into one. It is a rename plus a
+            find-and-replace, and it is the highest ratio of perceived polish to effort on this list.</p>
+        </div>
+      </div>
+
+      <div class="ux-item">
+        <span class="rank">03</span>
+        <div>
+          <h3>Focus is unstyleable because it is unreadable</h3>
+          <p>Beyond the ring colour: the check cards in the verifier are <span class="mono">&lt;button&gt;</span>
+            elements wrapping a <span class="mono">Checkbox</span> whose pointer events are disabled. They
+            are reachable and operable by keyboard, but with a 1.69:1 ring the state is invisible.</p>
+          <p class="fix"><b>Fix:</b> darken <span class="mono">--ring</span> to the accent's
+            <span class="mono">-deep</span> step and add
+            <span class="mono">focus-visible:ring-2 ring-offset-2</span> to the card, not just the inner box.</p>
+        </div>
+      </div>
+
+      <div class="ux-item">
+        <span class="rank">04</span>
+        <div>
+          <h3>Verdicts are colour-coded but never spelled out</h3>
+          <p>Six verdict states resolve to four accent styles, and <span class="mono">no_match</span>
+            shares <span class="mono">accent: "no"</span> with a genuine NO. A "no identity found" is a
+            very different event from "we found them and the answer is no" — one means check your
+            typing, the other means the fact is false.</p>
+          <p class="fix"><b>Fix:</b> give <span class="mono">no_match</span> its own neutral register
+            (the warm grey above) and lead each verdict with its plain-language sentence, not the
+            all-caps label.</p>
+        </div>
+      </div>
+
+      <div class="ux-item">
+        <span class="rank">05</span>
+        <div>
+          <h3>The receipt prints, but it prints without a title block</h3>
+          <p>Print isolation works — <span class="mono">no-print</span> and <span class="mono">print-area</span>
+            are applied correctly, and the portal shell is now excluded. But a PDF of a receipt has no
+            page title, no URL, and no "printed on" line, so a saved copy circulates with no way to tell
+            where it came from or when it was made.</p>
+          <p class="fix"><b>Fix:</b> a print-only footer with the receipt URL, the verification
+            timestamp and the vault key fingerprint. It costs nothing on screen and makes the artifact
+            defensible on paper.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>All contrast values computed live with the WCAG 2.1 relative-luminance formula.</span>
+    <span>Measured against <span class="mono">app/globals.css</span> as it stands today.</span>
+  </footer>
+</div>
+
+<script>
+  // ---- WCAG 2.1 relative luminance + contrast --------------------------
+  function luminance(hex) {
+    const h = hex.replace("#", "");
+    const parts = [0, 2, 4].map(function (i) {
+      const c = parseInt(h.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * parts[0] + 0.7152 * parts[1] + 0.0722 * parts[2];
+  }
+  function contrast(a, b) {
+    const la = luminance(a), lb = luminance(b);
+    const hi = Math.max(la, lb), lo = Math.min(la, lb);
+    return (hi + 0.05) / (lo + 0.05);
+  }
+
+  const DIRECTIONS = {
+    a: {
+      name: "Warm Hallmark",
+      ramp: [
+        ["50", "#f3f3ee"], ["100", "#e8e9e2"], ["200", "#dcddd8"], ["300", "#c2c5bc"],
+        ["400", "#9aa096"], ["500", "#7c8077"], ["600", "#626560"], ["700", "#3d3f39"],
+        ["800", "#26251f"], ["900", "#181712"], ["950", "#0e0d0a"]
+      ],
+      ground: "#f7f7f2",
+      surface: "#ffffff",
+      chip: "#f3f3ee",
+      line: "#dcddd8",
+      line2: "#cfd1c9",
+      ink: "#181712",
+      ink2: "#4a4a42",
+      ink3: "#7a7a70",
+      accent: "#f4c542",
+      accentInk: "#8a6300",
+      accentSoft: "#fff4c7",
+      accentBorder: "#ecda97",
+      ring: "#8a6300",
+      neutral: "#6b6b62",
+      neutralSoft: "#f2f2ec",
+      note: "<b>Keeps everything you already have, and makes it true.</b> The ramp gains real steps at the dark end so the receipt band and the verify plate become actual gradients instead of flat black; the accent text token moves to the <span class=\"mono\">-deep</span> step that already passes; the cool grey becomes a warm one; the navy grid is dropped. Nothing a judge sees today moves more than a few percent — the system just stops lying about itself."
+    },
+    b: {
+      name: "Deep Green Trust",
+      ramp: [
+        ["50", "#f1f4f1"], ["100", "#e2e9e3"], ["200", "#c9d5cc"], ["300", "#a6b6aa"],
+        ["400", "#7c8f82"], ["500", "#5c7064"], ["600", "#45574b"], ["700", "#324138"],
+        ["800", "#1d4534"], ["900", "#123024"], ["950", "#081b13"]
+      ],
+      ground: "#f8f8f5",
+      surface: "#ffffff",
+      chip: "#f1f4f1",
+      line: "#d7ded9",
+      line2: "#c3cdc6",
+      ink: "#0f1f18",
+      ink2: "#41544a",
+      ink3: "#6f8279",
+      accent: "#f4c542",
+      accentInk: "#8a6300",
+      accentSoft: "#fff4c7",
+      accentBorder: "#ecda97",
+      ring: "#0f5c3f",
+      neutral: "#5f6f66",
+      neutralSoft: "#eef2ef",
+      note: "<b>The institutional register, without giving up the gold.</b> Green carries trust and verification in almost every identity system, and green-plus-gold is a pairing with an actual story for this track. It costs you one thing: the warm cream ground has to neutralise to a cooler off-white, or the yellow bias in <span class=\"mono\">#f7f7f2</span> fights the green. That is a wider change than A, and it touches every surface."
+    },
+    c: {
+      name: "Institutional Indigo",
+      ramp: [
+        ["50", "#eef0fb"], ["100", "#e0e4f8"], ["200", "#c6cdf1"], ["300", "#a3ade6"],
+        ["400", "#7b87d6"], ["500", "#5b66c2"], ["600", "#464aa3"], ["700", "#383b82"],
+        ["800", "#312e81"], ["900", "#1e1b4b"], ["950", "#14122e"]
+      ],
+      ground: "#f8f8fa",
+      surface: "#ffffff",
+      chip: "#eef0fb",
+      line: "#dcdfe9",
+      line2: "#cbd0e0",
+      ink: "#191a33",
+      ink2: "#4a4d6b",
+      ink3: "#787c99",
+      accent: "#f4c542",
+      accentInk: "#8a6300",
+      accentSoft: "#fff4c7",
+      accentBorder: "#ecda97",
+      ring: "#383b82",
+      neutral: "#6b6d85",
+      neutralSoft: "#f0f1f8",
+      note: "<b>The safe answer, and the one I would not pick.</b> Indigo-and-gold is the most classic trust pairing there is, and it will look competent. It will also look like the identity layer of every other submission in this track — which is the whole reason your gold-on-black currently reads as memorable. Take this only if the rest of the product needs to feel institutional rather than distinctive."
+    }
+  };
+
+  const RECOMMENDED = "a";
+  const REC_COPY = {
+    a: "Ship this. It closes all six findings with a token edit, costs no re-layout, and keeps the one thing that makes Quebec recognisable in a room full of blue identity products. A design that is coherent and a little unusual scores above one that is correct and forgettable.",
+    b: "Take this if you have a spare day and want a brand hue that carries meaning rather than just contrast. Fix A first regardless — B needs A's ramp and A's accent token to work at all.",
+    c: "Only if an institutional register is a stated requirement. Competent, low-risk, and indistinguishable from the rest of the track."
+  };
+
+  const specimen = document.getElementById("specimen");
+  const band = document.getElementById("band");
+  const rampEl = document.getElementById("ramp");
+  const rampLabels = document.getElementById("rampLabels");
+  const measures = document.getElementById("measures");
+  const dnote = document.getElementById("dnote");
+  const recTag = document.getElementById("recTag");
+  const recCopy = document.getElementById("recCopy");
+
+  function setDir(key) {
+    const d = DIRECTIONS[key];
+    const step = {};
+    d.ramp.forEach(function (s) { step[s[0]] = s[1]; });
+
+    // Paint the specimen through custom properties.
+    const vars = {
+      "--d-ground": d.ground,
+      "--d-surface": d.surface,
+      "--d-chip": d.chip,
+      "--d-line": d.line,
+      "--d-line-2": d.line2,
+      "--d-ink": d.ink,
+      "--d-ink-2": d.ink2,
+      "--d-ink-3": d.ink3,
+      "--d-accent": d.accent,
+      "--d-accent-ink": d.accentInk,
+      "--d-accent-soft": d.accentSoft,
+      "--d-accent-border": d.accentBorder,
+      "--d-ring": d.ring,
+      "--d-active-bg": d.accentSoft,
+      "--d-700": step["700"],
+      "--d-900": step["900"]
+    };
+    Object.keys(vars).forEach(function (k) { specimen.style.setProperty(k, vars[k]); });
+
+    band.style.background = "linear-gradient(90deg, " + step["900"] + " 0%, " + step["800"] + " 52%, " + step["950"] + " 100%)";
+
+    rampEl.innerHTML = d.ramp.map(function (s) {
+      return '<span class="sw" style="background:' + s[1] + '"></span>';
+    }).join("");
+    rampLabels.innerHTML = d.ramp.map(function (s) {
+      return "<span>" + s[0] + "</span>";
+    }).join("");
+
+    const checks = [
+      { label: "Accent text on its soft fill", sub: d.accentInk + " on " + d.accentSoft, val: contrast(d.accentInk, d.accentSoft), min: 4.5 },
+      { label: "Accent text on the page", sub: d.accentInk + " on " + d.ground, val: contrast(d.accentInk, d.ground), min: 4.5 },
+      { label: "Focus ring on a card", sub: d.ring + " on " + d.surface, val: contrast(d.ring, d.surface), min: 3 },
+      { label: "White on the receipt band", sub: "#ffffff on " + step["900"], val: contrast("#ffffff", step["900"]), min: 4.5 },
+      { label: "Body ink on the ground", sub: d.ink2 + " on " + d.ground, val: contrast(d.ink2, d.ground), min: 4.5 }
+    ];
+
+    measures.innerHTML = checks.map(function (c) {
+      const pass = c.val >= c.min;
+      const r = c.val.toFixed(2) + ":1";
+      return '<div class="measure">' +
+        '<span class="lbl"><b>' + c.label + '</b><code>' + c.sub + '</code></span>' +
+        '<span class="val">' +
+          '<span class="num ' + (pass ? "pass" : "fail") + '">' + r + '</span>' +
+          '<span class="flag ' + (pass ? "pass" : "fail") + '">' + (pass ? "PASS" : "FAIL") + "</span>" +
+        "</span></div>";
+    }).join("");
+
+    dnote.innerHTML = d.note;
+
+    const isRec = key === RECOMMENDED;
+    recTag.style.display = isRec ? "" : "none";
+    recCopy.textContent = REC_COPY[key];
+
+    document.querySelectorAll(".tab").forEach(function (t) {
+      t.setAttribute("aria-selected", String(t.dataset.dir === key));
+    });
+  }
+
+  document.querySelectorAll(".tab").forEach(function (t) {
+    t.addEventListener("click", function () { setDir(t.dataset.dir); });
+  });
+
+  setDir(RECOMMENDED);
+</script>

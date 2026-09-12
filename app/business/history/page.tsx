@@ -33,7 +33,7 @@ export default function BusinessHistoryPage() {
       <Card>
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2">
-            <ReceiptText className="h-5 w-5 text-gold-strong" />
+            <ReceiptText className="h-5 w-5 text-brand-400" />
             Check history
           </CardTitle>
           <CardDescription>
@@ -47,7 +47,7 @@ export default function BusinessHistoryPage() {
       </Card>
 
       <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-        <ShieldCheck className="h-3.5 w-3.5 text-gold-strong" />
+        <ShieldCheck className="h-3.5 w-3.5 text-brand-400" />
         Every check above is signed, timestamped and re-checkable.
       </p>
     </AppShell>

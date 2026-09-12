@@ -34,7 +34,7 @@ export default function BusinessUsersPage() {
       <Card>
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-gold-strong" />
+            <Users className="h-5 w-5 text-brand-400" />
             Access
           </CardTitle>
           <CardDescription>
@@ -51,7 +51,7 @@ export default function BusinessUsersPage() {
           Every check is signed and auditable.
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <Link href="/business/verify" className="font-medium text-gold-strong hover:underline">
+          <Link href="/business/verify" className="font-medium text-brand-900 hover:underline">
             <ScanSearch className="mr-1 inline h-3.5 w-3.5" />
             Verify a reference
           </Link>

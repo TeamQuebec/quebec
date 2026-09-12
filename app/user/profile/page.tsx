@@ -27,8 +27,8 @@ export default function ProfilePage() {
     return (
       <AppShell>
         <div className="mx-auto max-w-xl py-12 text-center sm:py-16">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gold-soft">
-            <Fingerprint className="h-7 w-7 text-gold-strong" />
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100">
+            <Fingerprint className="h-7 w-7 text-brand-600" />
           </span>
           <h1 className="mt-5 font-display text-2xl font-bold tracking-tight text-brand-950">
             No record to show yet

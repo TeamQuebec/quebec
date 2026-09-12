@@ -53,7 +53,9 @@ export function CopyButton({
       className={cn("gap-1.5", className)}
     >
       {copied ? (
-        <Check className="h-3.5 w-3.5 text-gold-strong" />
+        // Green: the system did the thing and it worked. Gold here meant the
+        // clipboard was "the answer", which is not what gold is for.
+        <Check className="h-3.5 w-3.5 text-verify" />
       ) : (
         <Copy className="h-3.5 w-3.5" />
       )}

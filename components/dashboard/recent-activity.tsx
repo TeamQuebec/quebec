@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export interface RecentActivityItem {
   id: string;
   icon: LucideIcon;
-  /** tinted chip classes : e.g. "bg-gold-soft text-gold-strong" */
+  /** tinted chip classes : e.g. "bg-brand-50 text-brand-700" */
   iconClass: string;
   title: string;
   sub?: string;
@@ -66,7 +66,7 @@ export function RecentActivity({
                 {item.href && (
                   <Link
                     href={item.href}
-                    className="inline-flex items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-gold-strong hover:bg-gold-soft"
+                    className="inline-flex items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-brand-900 hover:bg-brand-100"
                   >
                     {item.hrefLabel ?? "View"}
                     <ArrowUpRight className="h-3.5 w-3.5" />

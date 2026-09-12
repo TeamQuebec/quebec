@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/site/logo";
 
 interface FooterLink {
   label: string;
@@ -55,9 +56,7 @@ export function LandingFooter() {
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-4">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 font-sans text-[13px] font-bold text-af-accent">
-                Q
-              </span>
+              <LogoMark className="h-7 w-7" plate="rgba(255,255,255,0.10)" />
               <span className="text-[17px] font-bold tracking-tight text-white">Quebec</span>
             </div>
             <p className="mt-5 max-w-[300px] text-sm leading-relaxed text-af-muted-2">

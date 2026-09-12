@@ -13,7 +13,7 @@ const buttonVariants = cva(
         brand:
           "bg-gradient-to-b from-brand-700 to-brand-900 text-white shadow-sm shadow-brand-900/20 hover:from-brand-600 hover:to-brand-800 active:to-brand-950",
         accent:
-          "bg-gold text-af-ink shadow-sm hover:bg-gold-strong hover:text-white active:bg-gold-deep",
+          "bg-gold text-af-ink shadow-sm hover:bg-gold-strong hover:text-white active:bg-gold-strong",
         secondary:
           "bg-brand-50 text-brand-900 hover:bg-brand-100",
         outline:
@@ -21,8 +21,11 @@ const buttonVariants = cva(
         ghost: "text-brand-700 hover:bg-brand-50 hover:text-brand-900",
         destructive:
           "bg-rose-600 text-white shadow-sm hover:bg-rose-500",
+        // Green, not gold. It used to be a byte-for-byte copy of `accent`, which
+        // made "success" mean nothing. Success is the system attesting to itself;
+        // the answer to a check stays gold.
         success:
-          "bg-gold text-af-ink shadow-sm hover:bg-gold-strong hover:text-white",
+          "bg-verify text-white shadow-sm hover:bg-verify-strong",
         warning:
           "bg-amber-500 text-white shadow-sm hover:bg-amber-400",
         link: "text-brand-700 underline-offset-4 hover:underline",

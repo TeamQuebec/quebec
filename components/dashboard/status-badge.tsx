@@ -5,9 +5,12 @@ import type { GrantStatus } from "@/lib/types";
 /** Status presentation shared by the sidebar lists and both dashboard tables. */
 export const STATUS_META: Record<
   GrantStatus,
-  { label: string; badge: "accent" | "warning" | "muted"; dot: string }
+  { label: string; badge: "secondary" | "warning" | "muted"; dot: string }
 > = {
-  granted: { label: "Current", badge: "accent", dot: "bg-gold" },
+  // "Current" is a state, not an answer and not an attestation, so it is ink.
+  // It was gold, which is the same colour as a verified YES — so a live grant
+  // and a positive answer looked like the same fact.
+  granted: { label: "Current", badge: "secondary", dot: "bg-brand-800" },
   requested: { label: "Pending", badge: "warning", dot: "bg-amber-400" },
   revoked: { label: "Revoked", badge: "muted", dot: "bg-brand-300" },
 };

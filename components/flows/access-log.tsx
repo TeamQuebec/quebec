@@ -19,10 +19,13 @@ export const TYPE_STYLE: Record<
   LogType,
   { icon: typeof ShieldCheck; classes: string }
 > = {
-  check: { icon: ShieldCheck, classes: "bg-gold-soft text-gold-strong" },
+  // `check` keeps green: this log is the audit trail of the system verifying
+  // things, so it is the integrity axis, not the answer axis. Everything else
+  // here is a kind of event, not a verdict, so it takes ink or its own semantic.
+  check: { icon: ShieldCheck, classes: "bg-verify-soft text-verify-strong" },
   grant: { icon: KeyRound, classes: "bg-brand-50 text-brand-600" },
   revoke: { icon: Ban, classes: "bg-rose-50 text-rose-600" },
-  approve: { icon: Check, classes: "bg-gold-soft text-gold-strong" },
+  approve: { icon: Check, classes: "bg-brand-50 text-brand-600" },
   deny: { icon: X, classes: "bg-muted text-muted-foreground" },
   enroll: { icon: UserPlus, classes: "bg-violet-50 text-violet-600" },
 };
@@ -67,7 +70,7 @@ export function AccessLog() {
               {entry.verificationId && (
                 <Link
                   href={`/receipt/${entry.verificationId}`}
-                  className="inline-flex shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-gold-strong hover:bg-gold-soft"
+                  className="inline-flex shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-brand-900 hover:bg-brand-100"
                 >
                   Receipt
                   <ChevronRight className="h-3.5 w-3.5" />

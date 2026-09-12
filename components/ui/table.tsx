@@ -1,11 +1,12 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { ScrollX } from "@/components/ui/scroll-x";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <div className="relative w-full overflow-x-auto">
+    <ScrollX className="w-full">
       <table className={cn("w-full caption-bottom text-sm", className)} {...props} />
-    </div>
+    </ScrollX>
   );
 }
 

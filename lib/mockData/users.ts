@@ -2,17 +2,22 @@ import type { KycStatus } from "@/lib/types";
 import { daysAgo } from "@/lib/format";
 
 /**
- * SYNTHETIC IDENTITY DATASET
- * ---------------------------
- * Every record below is fabricated for demonstration: invented Nigerian-style
- * names, random dates of birth, and 11-digit NIN-format numbers that resemble
- * no real registry entry. No real personal information is used, collected or
- * stored at any stage of this project.
+ * SYNTHETIC IDENTITY DATASET — curated, fully fabricated
+ * ------------------------------------------------------
+ * Every record below is invented for demonstration: Nigerian-style name
+ * combinations, random dates of birth, and 11-digit NIN-format numbers that
+ * correspond to no real person and no real registry entry. No real personal
+ * information is used, collected or stored at any stage of this project.
  *
- * Ages are deliberately mixed so the "Is over 18?" check has real YES and NO
- * outcomes to demo (see the UNDER-18 entries).
+ * GENERATED FILE — do not edit by hand. The authoritative cast lives in
+ * `scripts/generate-mock-users.mjs`:
  *
- * Regenerate an equivalent dataset with:  npm run generate:users
+ *   npm run generate:users    rewrite this file from that cast
+ *   npm run check:users       verify this file still matches it (fails loudly)
+ *
+ * Ages are deliberately mixed so the "Is over 18?" check has both YES and NO
+ * outcomes to demo. The two pinned anchors below are asserted by the generator,
+ * which errors rather than emit a cast that can no longer demo its own story.
  */
 
 export interface SyntheticUserRecord {

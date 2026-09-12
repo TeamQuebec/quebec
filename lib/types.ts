@@ -1,7 +1,6 @@
 /**
- * Quebec — domain types (Phase 1: mock). These mirror the shapes the real
- * backend will return in Phase 2, so switching from `mockApi` to Supabase
- * only touches one file.
+ * Quebec — domain types. These mirror the shapes a real backend would return,
+ * so swapping `mockApi` for Supabase only touches one file.
  */
 
 /** Whether the record passed an independent (document / NIN) verification step. */
@@ -67,8 +66,12 @@ export interface Verification {
   checks: CheckResult[];
   verdict: Verdict;
   requestedAt: string;
-  /** deterministic pseudo-hash for the tamper-evident look (Phase 2: real signature) */
+  /** SHA-256 of the canonical receipt payload — 64 hex chars */
   hash: string;
+  /** base64 ECDSA P-256 signature over the same canonical bytes; null if the vault was unavailable */
+  signature: string | null;
+  /** fingerprint of the key that signed this receipt, so it names its own signer */
+  keyId: string | null;
   note: string;
 }
 
@@ -92,6 +95,8 @@ export interface Store {
   verifications: Verification[];
   activeIdentityId: string;
   activeBusinessId: string;
+  /** fingerprint of the vault signing key, published so receipts can be re-checked */
+  vaultKeyId: string | null;
 }
 
 export interface EnrollInput {

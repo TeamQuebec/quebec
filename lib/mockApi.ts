@@ -10,6 +10,17 @@ import {
   normalizeReference,
   pseudoHash,
 } from "@/lib/refs";
+import {
+  VaultUnavailableError,
+  isSealed,
+  openJson,
+  sealJson,
+  signPayload,
+  verifyPayload,
+  vaultIdentity,
+  type ReceiptSignature,
+  type VerifyResult,
+} from "@/lib/vault";
 import type {
   AccessLogEntry,
   Business,
@@ -27,15 +38,24 @@ import type {
 } from "@/lib/types";
 
 /**
- * MOCK API — the only place "backend" behaviour lives in Phase 1.
- * -----------------------------------------------------------------
- * Everything reads/writes an in-memory store persisted to localStorage so a
- * full demo story survives refreshes. Signatures mirror the future backend, so
- * Phase 2 replaces the bodies with Supabase calls (auth, encrypted KYC storage,
- * real verification, audit log) without touching the UI.
+ * MOCK API — the only place "backend" behaviour lives.
+ * ----------------------------------------------------
+ * Everything reads/writes an in-memory store. In the browser that store is
+ * sealed with AES-GCM (lib/vault.ts) before it is written to localStorage, so
+ * what sits at rest is ciphertext, and every Verification carries a real ECDSA
+ * signature over a canonical payload rather than a look-alike hash.
+ *
+ * The exported function signatures still mirror the shape a real backend would
+ * have, so swapping the bodies for network calls stays a single-file change.
  */
 
-const STORAGE_KEY = "qbc.mock.store.v1";
+/** Sealed (AES-GCM) store. */
+const STORAGE_KEY = "qbc.mock.store.v2";
+/** Pre-encryption plaintext store, migrated on first load. */
+const LEGACY_STORAGE_KEY = "qbc.mock.store.v1";
+
+/** In-memory memo of the vault's signing key fingerprint. */
+let vaultKeyId: string | null = null;
 
 /** Artificial latency so the UI's loading states read as real. */
 function delay(ms = 320): Promise<void> {
@@ -43,8 +63,51 @@ function delay(ms = 320): Promise<void> {
 }
 
 let cached: Store | null = null;
+/** In-flight first load, so two callers cannot seed two different stores. */
+let pending: Promise<Store> | null = null;
 
-function freshSeed(): Store {
+/**
+ * The exact bytes a receipt commits to. Signing and verification BOTH go through
+ * this one function, so a receipt re-check can never drift from what was signed.
+ * `note` is deliberately included: editing the human-readable explanation breaks
+ * the signature just as editing the verdict does.
+ */
+export function receiptPayload(v: {
+  id: string;
+  identityReference: string | null;
+  businessId: string;
+  checks: CheckResult[];
+  verdict: Verdict;
+  requestedAt: string;
+}) {
+  return {
+    id: v.id,
+    identityReference: v.identityReference,
+    businessId: v.businessId,
+    checks: v.checks,
+    verdict: v.verdict,
+    requestedAt: v.requestedAt,
+  };
+}
+
+/**
+ * Sign a receipt. If WebCrypto is unavailable we do NOT fake a signature — the
+ * receipt is stored unsigned, and the UI says so.
+ */
+async function signReceipt(
+  payload: unknown
+): Promise<{ hash: string; signature: string | null; keyId: string | null }> {
+  try {
+    const sig: ReceiptSignature = await signPayload(payload);
+    vaultKeyId = sig.keyId;
+    return { hash: sig.hash, signature: sig.signature, keyId: sig.keyId };
+  } catch (err) {
+    if (!(err instanceof VaultUnavailableError)) throw err;
+    return { hash: pseudoHash(JSON.stringify(payload)), signature: null, keyId: null };
+  }
+}
+
+async function freshSeed(): Promise<Store> {
   const identities = buildSeedIdentities();
   const demo = identities.find((i) => i.uniqueId === DEMO_IDENTITY_REFERENCE) ?? identities[0];
   const activeBusinessId = "biz_safebank";
@@ -62,15 +125,24 @@ function freshSeed(): Store {
     { id: "grant_demo_quickmart", identityId: d, businessId: "biz_quickmart", status: "revoked", scopes: ["over_18", "name_matches"], requestedAt: daysAgo(14), grantedAt: daysAgo(14), revokedAt: daysAgo(2) }
   );
 
-  const mkVerification = (over: {
+  const mkVerification = async (over: {
     identity: Identity;
     businessId: string;
     checks: CheckResult[];
     verdict: Verdict;
     requestedAt: string;
     note: string;
-  }): Verification => {
+  }): Promise<Verification> => {
     const id = generateVerificationId();
+    const payload = receiptPayload({
+      id,
+      identityReference: over.identity.uniqueId,
+      businessId: over.businessId,
+      checks: over.checks,
+      verdict: over.verdict,
+      requestedAt: over.requestedAt,
+    });
+    const signed = await signReceipt(payload);
     const v: Verification = {
       id,
       identityId: over.identity.id,
@@ -80,15 +152,13 @@ function freshSeed(): Store {
       verdict: over.verdict,
       requestedAt: over.requestedAt,
       note: over.note,
-      hash: pseudoHash(
-        JSON.stringify([id, over.identity.uniqueId, over.businessId, over.checks, over.requestedAt])
-      ),
+      ...signed,
     };
     verifications.push(v);
     return v;
   };
 
-  const vfy1 = mkVerification({
+  const vfy1 = await mkVerification({
     identity: demo,
     businessId: "biz_safebank",
     checks: [{ checkId: "over_18", answer: "yes", note: "Holder is 18 or older." }],
@@ -96,7 +166,7 @@ function freshSeed(): Store {
     requestedAt: daysAgo(2),
     note: "All requested facts were confirmed.",
   });
-  const vfy2 = mkVerification({
+  const vfy2 = await mkVerification({
     identity: demo,
     businessId: "biz_smiletrust",
     checks: [{ checkId: "name_matches", answer: "yes", note: "Name matches the verified record." }],
@@ -141,19 +211,26 @@ function freshSeed(): Store {
       ) as CheckId[];
       if (scopes.length === 0) scopes.push("over_18");
 
-      const requestedAt = daysAgo(1 + Math.floor(rng() * 12));
+      // Timestamps run forwards: request, then grant, then any checks. The old
+      // version drew each date independently, so a check could be dated before
+      // the grant that allowed it — the kind of detail that makes a demo's audit
+      // trail read as fake.
+      const reqDays = 6 + Math.floor(rng() * 20);
+      const requestedAt = daysAgo(reqDays);
+      const grantedDays = Math.max(1, reqDays - (1 + Math.floor(rng() * 5)));
 
       if (roll < 0.68) {
         // granted
-        grants.push({ id: generateInternalId("grant"), identityId: identity.id, businessId: biz.id, status: "granted", scopes, requestedAt, grantedAt: daysAgo(Math.floor(rng() * 9)) });
+        const grantedAt = daysAgo(grantedDays);
+        grants.push({ id: generateInternalId("grant"), identityId: identity.id, businessId: biz.id, status: "granted", scopes, requestedAt, grantedAt });
         const answers = computeAnswers(identity, scopes);
         const verdict = verdictOf(answers);
-        const vfy = mkVerification({
+        const vfy = await mkVerification({
           identity,
           businessId: biz.id,
           checks: answers,
           verdict,
-          requestedAt: daysAgo(Math.floor(rng() * 3)),
+          requestedAt: daysAgo(Math.max(0, grantedDays - (1 + Math.floor(rng() * 3)))),
           note: verdictNote(verdict),
         });
         log({ identityId: identity.id, businessId: biz.id, type: "check", message: `${biz.name} verified ${scopeSummary(scopes)}?`, at: vfy.requestedAt, verificationId: vfy.id });
@@ -164,8 +241,8 @@ function freshSeed(): Store {
         log({ identityId: identity.id, businessId: biz.id, type: "grant", message: `${biz.name} requested access to verify ${scopeSummary(scopes).toLowerCase()}.`, at: requestedAt });
       } else {
         // revoked
-        const grantedAt = daysAgo(2 + Math.floor(rng() * 8));
-        const revokedAt = daysAgo(Math.floor(rng() * 2));
+        const grantedAt = daysAgo(grantedDays);
+        const revokedAt = daysAgo(Math.max(0, grantedDays - (1 + Math.floor(rng() * 3))));
         grants.push({ id: generateInternalId("grant"), identityId: identity.id, businessId: biz.id, status: "revoked", scopes, requestedAt, grantedAt, revokedAt });
         log({ identityId: identity.id, businessId: biz.id, type: "grant", message: `${biz.name} was granted access.`, at: grantedAt });
         log({ identityId: identity.id, businessId: biz.id, type: "revoke", message: `You revoked ${biz.name}'s access.`, at: revokedAt });
@@ -173,68 +250,92 @@ function freshSeed(): Store {
     }
   }
 
-  // ---- Business portal demo: give the signed-in business a realistic roster ----
-  const safebankUsers = identities.filter((i) => i.id !== d).slice(0, 10);
-  safebankUsers.forEach((identity, idx) => {
-    const scopes: CheckId[] =
-      idx % 2 === 0 ? ["over_18", "has_verified_identity"] : ["over_18", "name_matches"];
-    const requestedAt = daysAgo(20 - idx * 2);
+  // ---- Business portal demo: every business gets a real roster ----
+  // This used to seed SafeBank NG only. That was fine while the business portal
+  // was hard-wired to one business, but signing in as any other one now shows
+  // that business's own data — so every business needs history of its own, or
+  // most of the sign-in options open an empty shell.
+  const ROSTER_SIZE: Record<string, number> = {
+    biz_safebank: 10, // the demo's default business, and the busiest
+    biz_smiletrust: 6,
+    biz_paycycle: 5,
+    biz_quickmart: 5,
+    biz_novapay: 5,
+    biz_glidecredit: 4,
+    biz_healthsure: 4,
+    biz_citycabs: 4,
+    biz_faithbanc: 4,
+  };
 
-    if (idx < 6) {
-      // granted — each with 1-2 checks on record
-      const grantedAt = daysAgo(19 - idx * 2);
-      grants.push({
-        id: generateInternalId("grant"),
-        identityId: identity.id,
-        businessId: "biz_safebank",
-        status: "granted",
-        scopes,
-        requestedAt,
-        grantedAt,
-      });
-      log({ identityId: identity.id, businessId: "biz_safebank", type: "grant", message: "SafeBank NG was granted access.", at: grantedAt });
-      const vfyCount = idx % 2 === 0 ? 2 : 1;
-      for (let k = 0; k < vfyCount; k++) {
-        const answers = computeAnswers(identity, scopes);
-        const verdict = verdictOf(answers);
-        const vfy = mkVerification({
-          identity,
-          businessId: "biz_safebank",
-          checks: answers,
-          verdict,
-          requestedAt: daysAgo(Math.max(0, 17 - idx * 2 - k * 3)),
-          note: verdictNote(verdict),
-        });
-        log({ identityId: identity.id, businessId: "biz_safebank", type: "check", message: `SafeBank NG verified ${scopeSummary(scopes)}?`, at: vfy.requestedAt, verificationId: vfy.id });
-      }
-    } else if (idx < 8) {
-      // pending request from the business
-      grants.push({
-        id: generateInternalId("grant"),
-        identityId: identity.id,
-        businessId: "biz_safebank",
-        status: "requested",
-        scopes,
-        requestedAt,
-      });
-      log({ identityId: identity.id, businessId: "biz_safebank", type: "grant", message: `SafeBank NG requested access to verify ${scopeSummary(scopes).toLowerCase()}.`, at: requestedAt });
-    } else {
-      // holder revoked the business's access
-      const grantedAt = daysAgo(9);
-      grants.push({
-        id: generateInternalId("grant"),
-        identityId: identity.id,
-        businessId: "biz_safebank",
-        status: "revoked",
-        scopes,
-        requestedAt,
-        grantedAt,
-        revokedAt: daysAgo(1),
-      });
-      log({ identityId: identity.id, businessId: "biz_safebank", type: "grant", message: "SafeBank NG was granted access.", at: grantedAt });
-      log({ identityId: identity.id, businessId: "biz_safebank", type: "revoke", message: "You revoked SafeBank NG's access.", at: daysAgo(1) });
+  /** Fisher-Yates over the seeded rng, so a given cast always lands the same way. */
+  const shuffled = <T,>(arr: T[]): T[] => {
+    const out = arr.slice();
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
     }
-  });
+    return out;
+  };
+
+  const rosterPool = identities.filter((i) => i.id !== d);
+
+  for (const biz of BUSINESSES) {
+    const target = ROSTER_SIZE[biz.id] ?? 4;
+    let added = 0;
+
+    for (const identity of shuffled(rosterPool)) {
+      if (added >= target) break;
+      // Someone the per-identity pass already linked to this business keeps that
+      // story; a second grant for the same pair would read as a duplicate.
+      if (grants.some((g) => g.identityId === identity.id && g.businessId === biz.id)) continue;
+      added++;
+
+      const scopes: CheckId[] =
+        added % 3 === 0
+          ? ["over_18", "name_matches", "nin_matches", "has_verified_identity"]
+          : added % 2 === 0
+            ? ["over_18", "has_verified_identity"]
+            : ["over_18", "name_matches"];
+
+      const reqDays = 8 + Math.floor(rng() * 22); // 8–29 days ago
+      const requestedAt = daysAgo(reqDays);
+      const roll = rng();
+
+      if (roll < 0.62) {
+        const grantedDays = Math.max(1, reqDays - (2 + Math.floor(rng() * 6)));
+        const grantedAt = daysAgo(grantedDays);
+        grants.push({ id: generateInternalId("grant"), identityId: identity.id, businessId: biz.id, status: "granted", scopes, requestedAt, grantedAt });
+        log({ identityId: identity.id, businessId: biz.id, type: "grant", message: `${biz.name} was granted access.`, at: grantedAt });
+
+        const vfyCount = 1 + Math.floor(rng() * 2);
+        for (let k = 0; k < vfyCount; k++) {
+          const answers = computeAnswers(identity, scopes);
+          const verdict = verdictOf(answers);
+          const vfy = await mkVerification({
+            identity,
+            businessId: biz.id,
+            checks: answers,
+            verdict,
+            requestedAt: daysAgo(Math.max(0, grantedDays - (1 + Math.floor(rng() * 5)))),
+            note: verdictNote(verdict),
+          });
+          log({ identityId: identity.id, businessId: biz.id, type: "check", message: `${biz.name} verified ${scopeSummary(scopes)}?`, at: vfy.requestedAt, verificationId: vfy.id });
+        }
+      } else if (roll < 0.82) {
+        grants.push({ id: generateInternalId("grant"), identityId: identity.id, businessId: biz.id, status: "requested", scopes, requestedAt });
+        log({ identityId: identity.id, businessId: biz.id, type: "grant", message: `${biz.name} requested access to verify ${scopeSummary(scopes).toLowerCase()}.`, at: requestedAt });
+      } else {
+        const grantedDays = Math.max(3, reqDays - (2 + Math.floor(rng() * 6)));
+        const grantedAt = daysAgo(grantedDays);
+        const revokedAt = daysAgo(Math.max(0, grantedDays - (1 + Math.floor(rng() * 5))));
+        grants.push({ id: generateInternalId("grant"), identityId: identity.id, businessId: biz.id, status: "revoked", scopes, requestedAt, grantedAt, revokedAt });
+        log({ identityId: identity.id, businessId: biz.id, type: "grant", message: `${biz.name} was granted access.`, at: grantedAt });
+        log({ identityId: identity.id, businessId: biz.id, type: "revoke", message: `You revoked ${biz.name}'s access.`, at: revokedAt });
+      }
+    }
+  }
+
+  vaultKeyId = (await vaultIdentity().catch(() => null))?.keyId ?? null;
 
   return {
     identities,
@@ -244,35 +345,109 @@ function freshSeed(): Store {
     verifications,
     activeIdentityId: demo.id,
     activeBusinessId,
+    vaultKeyId,
   };
 }
 
-function loadStore(): Store {
-  if (cached) return cached;
-  if (typeof window === "undefined") return freshSeed();
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Store;
-      if (Array.isArray(parsed.identities) && parsed.identities.length > 0 && Array.isArray(parsed.grants)) {
-        cached = parsed;
-        return cached;
-      }
-    }
-  } catch {
-    // corrupted storage → reseed
-  }
-  cached = freshSeed();
-  saveStore(cached);
-  return cached;
+/** A parsed blob is only usable if it has the collections the UI assumes. */
+function isUsableStore(s: unknown): s is Store {
+  const c = s as Store | null;
+  return (
+    !!c &&
+    Array.isArray(c.identities) &&
+    c.identities.length > 0 &&
+    Array.isArray(c.grants) &&
+    Array.isArray(c.verifications) &&
+    Array.isArray(c.accessLog)
+  );
 }
 
-function saveStore(s: Store) {
+/**
+ * Bring an older store up to the current shape. Receipts written before the
+ * vault existed have no signature; we mark them unsigned rather than re-signing
+ * them, because re-signing would launder an unsecured record into one that
+ * claims to be signed.
+ */
+function normalizeStore(s: Store): Store {
+  s.vaultKeyId = s.vaultKeyId ?? vaultKeyId;
+  s.verifications = s.verifications.map((v) => ({
+    ...v,
+    signature: v.signature ?? null,
+    keyId: v.keyId ?? null,
+  }));
+  return s;
+}
+
+/**
+ * Load the store, seeding it on first run.
+ *
+ * Every caller shares one in-flight promise. Two concurrent callers used to be
+ * able to both miss the cache and seed independently, which left the object held
+ * in memory and the object written to localStorage as different stores — the
+ * session would then be reading one while writing the other.
+ */
+function loadStore(): Promise<Store> {
+  if (cached) return Promise.resolve(cached);
+  if (!pending) {
+    pending = readOrSeed().then(
+      (s) => {
+        cached = s;
+        pending = null;
+        return s;
+      },
+      (err) => {
+        pending = null;
+        throw err;
+      }
+    );
+  }
+  return pending;
+}
+
+async function readOrSeed(): Promise<Store> {
+  if (typeof window === "undefined") return freshSeed();
+
+  const sealed = window.localStorage.getItem(STORAGE_KEY);
+  if (sealed) {
+    try {
+      if (isSealed(sealed)) {
+        const parsed = await openJson<Store>(sealed);
+        if (isUsableStore(parsed)) return normalizeStore(parsed);
+      }
+    } catch {
+      // Wrong key, truncated blob, or tampering → fall through and reseed.
+    }
+  }
+
+  // One-time migration from the pre-encryption plaintext store.
+  const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+  if (legacy) {
+    try {
+      const parsed = JSON.parse(legacy) as Store;
+      if (isUsableStore(parsed)) {
+        const migrated = normalizeStore(parsed);
+        await saveStore(migrated);
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        return migrated;
+      }
+    } catch {
+      // ignore and reseed
+    }
+  }
+
+  const seeded = await freshSeed();
+  await saveStore(seeded);
+  return seeded;
+}
+
+async function saveStore(s: Store) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    window.localStorage.setItem(STORAGE_KEY, await sealJson(s));
   } catch {
-    // storage full / unavailable — demo keeps working in memory
+    // Vault unavailable, or storage full — the demo keeps working in memory.
+    // Deliberately NOT falling back to plaintext: writing the record unencrypted
+    // is the exact thing this module exists to stop doing.
   }
 }
 
@@ -287,19 +462,23 @@ function snapshot(s: Store): Store {
 
 export async function loadStoreApi(): Promise<Store> {
   await delay(120);
-  return snapshot(loadStore());
+  return snapshot(await loadStore());
 }
 
 export async function resetDemoApi(): Promise<Store> {
-  cached = freshSeed();
-  saveStore(cached);
+  // Settle any in-flight first load before replacing the store, so its promise
+  // cannot resolve afterwards and put the pre-reset data back in the cache.
+  await loadStore();
+  const seeded = await freshSeed();
+  cached = seeded;
+  await saveStore(seeded);
   await delay(150);
-  return snapshot(cached);
+  return snapshot(seeded);
 }
 
 export async function enrollIdentityApi(input: EnrollInput): Promise<{ store: Store; identity: Identity }> {
   await delay(850); // the "registration" feel
-  const store = loadStore();
+  const store = await loadStore();
   const identity: Identity = {
     id: generateInternalId("id"),
     uniqueId: generateUniqueId(),
@@ -319,26 +498,39 @@ export async function enrollIdentityApi(input: EnrollInput): Promise<{ store: St
     message: "You created your Quebec reference. It's the only thing you'll ever share.",
     at: nowIso(),
   });
-  saveStore(store);
+  await saveStore(store);
   return { store: snapshot(store), identity };
 }
 
 export async function verifyReferenceApi(input: VerifyInput): Promise<{ store: Store; verification: Verification }> {
   await delay(600); // verification "round-trip"
-  const store = loadStore();
+  const store = await loadStore();
   const ref = normalizeReference(input.reference);
   const checks = input.checks;
   const businessId = store.activeBusinessId;
 
   const identity = store.identities.find((i) => normalizeReference(i.uniqueId) === ref) ?? null;
 
-  const build = (over: {
+  const build = async (over: {
     verdict: Verdict;
     checkResults: CheckResult[];
     note: string;
     identityRef: string | null;
-  }): Verification => {
+  }): Promise<Verification> => {
     const id = generateVerificationId();
+    // One timestamp, read once. Taking it twice (once for the receipt, once for
+    // the hash) meant a receipt could fail to reproduce its own hash whenever the
+    // clock ticked between the two calls.
+    const requestedAt = nowIso();
+    const payload = receiptPayload({
+      id,
+      identityReference: over.identityRef,
+      businessId,
+      checks: over.checkResults,
+      verdict: over.verdict,
+      requestedAt,
+    });
+    const signed = await signReceipt(payload);
     const v: Verification = {
       id,
       identityId: identity?.id ?? null,
@@ -346,9 +538,9 @@ export async function verifyReferenceApi(input: VerifyInput): Promise<{ store: S
       businessId,
       checks: over.checkResults,
       verdict: over.verdict,
-      requestedAt: nowIso(),
+      requestedAt,
       note: over.note,
-      hash: pseudoHash(JSON.stringify([id, over.identityRef, businessId, over.checkResults, nowIso()])),
+      ...signed,
     };
     store.verifications.push(v);
     return v;
@@ -356,13 +548,13 @@ export async function verifyReferenceApi(input: VerifyInput): Promise<{ store: S
 
   // 1) Reference not found
   if (!identity) {
-    const v = build({
+    const v = await build({
       verdict: "no_match",
       checkResults: checks.map((c) => ({ checkId: c, answer: "unable" as CheckAnswer, note: "Reference not found in the registry." })),
       note: "No identity matched this reference.",
       identityRef: ref,
     });
-    saveStore(store);
+    await saveStore(store);
     return { store: snapshot(store), verification: v };
   }
 
@@ -371,13 +563,13 @@ export async function verifyReferenceApi(input: VerifyInput): Promise<{ store: S
   // 2) Access revoked or a pending request not yet approved
   if (grant && (grant.status === "revoked" || grant.status === "requested")) {
     const revoked = grant.status === "revoked";
-    const v = build({
+    const v = await build({
       verdict: revoked ? "revoked" : "pending",
       checkResults: checks.map((c) => ({ checkId: c, answer: "unable" as CheckAnswer, note: revoked ? "Access was revoked by the identity holder." : "This business has not been granted access." })),
       note: revoked ? "The identity holder revoked access to this business." : "This business has not been granted access by the holder.",
       identityRef: identity.uniqueId,
     });
-    saveStore(store);
+    await saveStore(store);
     return { store: snapshot(store), verification: v };
   }
 
@@ -407,7 +599,7 @@ export async function verifyReferenceApi(input: VerifyInput): Promise<{ store: S
 
   const answers = computeAnswers(identity, checks);
   const verdict = verdictOf(answers);
-  const v = build({ verdict, checkResults: answers, note: verdictNote(verdict), identityRef: identity.uniqueId });
+  const v = await build({ verdict, checkResults: answers, note: verdictNote(verdict), identityRef: identity.uniqueId });
 
   store.accessLog.push({
     id: generateInternalId("log"),
@@ -419,13 +611,13 @@ export async function verifyReferenceApi(input: VerifyInput): Promise<{ store: S
     verificationId: v.id,
   });
 
-  saveStore(store);
+  await saveStore(store);
   return { store: snapshot(store), verification: v };
 }
 
 export async function revokeGrantApi(grantId: string): Promise<Store> {
   await delay(200);
-  const store = loadStore();
+  const store = await loadStore();
   const grant = store.grants.find((g) => g.id === grantId);
   if (grant) {
     grant.status = "revoked";
@@ -438,14 +630,14 @@ export async function revokeGrantApi(grantId: string): Promise<Store> {
       message: `You revoked ${businessName(grant.businessId)}'s access.`,
       at: nowIso(),
     });
-    saveStore(store);
+    await saveStore(store);
   }
   return snapshot(store);
 }
 
 export async function approveGrantApi(grantId: string): Promise<Store> {
   await delay(200);
-  const store = loadStore();
+  const store = await loadStore();
   const grant = store.grants.find((g) => g.id === grantId);
   if (grant) {
     grant.status = "granted";
@@ -458,14 +650,14 @@ export async function approveGrantApi(grantId: string): Promise<Store> {
       message: `You approved ${businessName(grant.businessId)}'s access request.`,
       at: nowIso(),
     });
-    saveStore(store);
+    await saveStore(store);
   }
   return snapshot(store);
 }
 
 export async function denyGrantApi(grantId: string): Promise<Store> {
   await delay(200);
-  const store = loadStore();
+  const store = await loadStore();
   const idx = store.grants.findIndex((g) => g.id === grantId);
   if (idx >= 0) {
     const [grant] = store.grants.splice(idx, 1);
@@ -477,14 +669,14 @@ export async function denyGrantApi(grantId: string): Promise<Store> {
       message: `You declined ${businessName(grant.businessId)}'s access request.`,
       at: nowIso(),
     });
-    saveStore(store);
+    await saveStore(store);
   }
   return snapshot(store);
 }
 
 export async function restoreGrantApi(grantId: string): Promise<Store> {
   await delay(200);
-  const store = loadStore();
+  const store = await loadStore();
   const grant = store.grants.find((g) => g.id === grantId);
   if (grant) {
     grant.status = "granted";
@@ -497,29 +689,79 @@ export async function restoreGrantApi(grantId: string): Promise<Store> {
       message: `You allowed ${businessName(grant.businessId)} to verify facts again.`,
       at: nowIso(),
     });
-    saveStore(store);
+    await saveStore(store);
   }
   return snapshot(store);
 }
 
-export async function setActiveIdentityApi(identityId: string): Promise<Store> {
+/**
+ * Point the portal at the account this browser session is acting as.
+ *
+ * The account you signed in with IS the account whose dashboard loads — this is
+ * what makes that true. It runs on sign-in, on first load, and whenever the
+ * in-page switcher changes the active holder, so the two can't drift apart.
+ */
+export async function applySessionApi(kind: "user" | "business", id: string): Promise<Store> {
   await delay(60);
-  const store = loadStore();
-  if (store.identities.some((i) => i.id === identityId)) {
-    store.activeIdentityId = identityId;
-    saveStore(store);
+  const store = await loadStore();
+  let changed = false;
+
+  if (kind === "user" && store.activeIdentityId !== id && store.identities.some((i) => i.id === id)) {
+    store.activeIdentityId = id;
+    changed = true;
   }
+  if (kind === "business" && store.activeBusinessId !== id && store.businesses.some((b) => b.id === id)) {
+    store.activeBusinessId = id;
+    changed = true;
+  }
+
+  if (changed) await saveStore(store);
   return snapshot(store);
 }
 
 export async function getVerificationApi(id: string): Promise<Verification | null> {
   await delay(60);
-  const store = loadStore();
+  const store = await loadStore();
   return store.verifications.find((v) => v.id === id) ?? null;
 }
 
+/**
+ * Re-check a receipt against the vault's public key. This is the real thing the
+ * "anyone can re-check this receipt" claim refers to: the payload is rebuilt from
+ * the stored record, so editing any field of that record invalidates it.
+ */
+export async function verifyReceiptApi(
+  verificationId: string
+): Promise<{ verification: Verification | null; result: VerifyResult }> {
+  await delay(250);
+  const store = await loadStore();
+  const v = store.verifications.find((x) => x.id === verificationId) ?? null;
+  if (!v) {
+    return {
+      verification: null,
+      result: { status: "unsigned", reason: "No receipt with that id exists in this vault." },
+    };
+  }
+  const result = await verifyPayload(
+    receiptPayload(v),
+    v.signature ? { hash: v.hash, signature: v.signature, keyId: v.keyId ?? undefined } : null
+  );
+  return { verification: snapshot(v), result };
+}
+
+/** The vault's published signing key fingerprint, for the UI's trust anchor line. */
+export async function vaultKeyIdApi(): Promise<string | null> {
+  if (vaultKeyId) return vaultKeyId;
+  try {
+    vaultKeyId = (await vaultIdentity()).keyId;
+  } catch {
+    vaultKeyId = null;
+  }
+  return vaultKeyId;
+}
+
 // ---------------------------------------------------------------------------
-// Helpers (kept internal — these are exactly what Phase 2 signs with a key)
+// Helpers (kept internal — the vault key is what makes these verifiable)
 // ---------------------------------------------------------------------------
 
 export function computeAnswers(identity: Identity, checks: CheckId[]): CheckResult[] {

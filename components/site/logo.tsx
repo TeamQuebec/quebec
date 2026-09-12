@@ -1,23 +1,38 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export function LogoMark({ className }: { className?: string }) {
+/**
+ * The Quebec mark : a gold Q on a near-black plate.
+ *
+ * Drawn, not typed. The header used to set a literal "Q" character in the page
+ * font, which meant the mark's shape was whatever the webfont happened to do —
+ * and it could not be reused as the favicon at all, because a favicon renders
+ * outside the page and has no access to its fonts. A ring and a tail are
+ * geometry, so the mark is now identical in the sidebar, on the landing, on a
+ * receipt, and in the browser tab at 16px.
+ *
+ * `plate` exists for dark grounds: the black plate disappears against the
+ * footer and the receipt's header band, so those pass a lighter fill and keep
+ * the gold Q.
+ */
+export function LogoMark({
+  className,
+  plate = "#171717",
+}: {
+  className?: string;
+  /** Plate fill. Defaults to the brand black; dark grounds pass a lighter one. */
+  plate?: string;
+}) {
   return (
     <svg viewBox="0 0 32 32" className={cn("h-8 w-8", className)} aria-hidden="true">
-      <defs>
-        <linearGradient id="qbc-logo-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#3f423c" />
-          <stop offset="1" stopColor="#171717" />
-        </linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="url(#qbc-logo-g)" />
+      <rect width="32" height="32" rx="9" fill={plate} />
+      <circle cx="16" cy="15" r="6.25" fill="none" stroke="#f4c542" strokeWidth="3.25" />
       <path
-        d="M9.5 16.5l4.2 4.2 8.8-9.4"
+        d="M20.4 19.4 23 22"
         stroke="#f4c542"
-        strokeWidth="3.2"
-        fill="none"
+        strokeWidth="3.25"
         strokeLinecap="round"
-        strokeLinejoin="round"
+        fill="none"
       />
     </svg>
   );

@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { VerifyConsole } from "@/components/flows/verify-console";
 import { useApp } from "@/state/app-context";
 
@@ -21,17 +22,12 @@ export default function VerifyPage() {
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-strong">
-          Verifier portal
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">
-          Verify a customer
-        </h1>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-          All you need is their reference. Ask for a fact, get a signed answer.
-        </p>
-      </div>
+      {/* Was a hand-rolled copy of PageHeader. */}
+      <PageHeader
+        eyebrow="Verifier portal"
+        title="Verify a customer"
+        description="All you need is their reference. Ask for a fact, get a signed answer."
+      />
       <VerifyConsole />
     </AppShell>
   );

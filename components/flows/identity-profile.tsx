@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CopyButton } from "@/components/site/copy-button";
+import { AbsenceNote } from "@/components/site/absence-note";
 import { avatarColor, initials } from "@/components/site/business-avatar";
 import { useApp } from "@/state/app-context";
 import { computeAge, formatDateTime, formatDob } from "@/lib/format";
@@ -51,7 +52,6 @@ export function IdentityProfile() {
   return (
     <div className="space-y-6">
       <Card className="overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-brand-700 via-brand-500 to-gold" />
         <CardContent className="p-6 sm:p-8">
           {/* Identity switcher + status */}
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -67,7 +67,9 @@ export function IdentityProfile() {
                 ))}
               </SelectContent>
             </Select>
-            <Badge variant={verified ? "accent" : "muted"} className="gap-1">
+            {/* "Verified" is the system attesting to the record's provenance, so
+                it is green — the same claim axis as a signed receipt. */}
+            <Badge variant={verified ? "success" : "muted"} className="gap-1">
               {verified ? (
                 <>
                   <ShieldCheck className="h-3 w-3" />
@@ -115,7 +117,7 @@ export function IdentityProfile() {
               <span className="font-mono tracking-[0.14em]">{maskNin(id.nin)}</span>
             </DetailRow>
             <DetailRow label="KYC status">
-              <Badge variant={verified ? "accent" : "muted"}>
+              <Badge variant={verified ? "success" : "muted"}>
                 {verified ? "Document-verified" : "Self-asserted"}
               </Badge>
             </DetailRow>
@@ -124,22 +126,14 @@ export function IdentityProfile() {
         </CardContent>
       </Card>
 
-      {/* Minimal-disclosure note */}
-      <div className="flex items-start gap-3 rounded-xl border border-gold-border bg-gold-soft/60 p-4">
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-gold-strong ring-1 ring-black/5">
-          <Lock className="h-5 w-5" />
-        </span>
-        <div>
-          <p className="text-sm font-semibold text-brand-950">This is everything that exists.</p>
-          <p className="mt-1 text-xs leading-relaxed text-brand-800">
-            Three fields built this record : nothing else is stored. Businesses only ever see a
-            signed YES / NO to the facts you grant, never this page.
-          </p>
-        </div>
-      </div>
+      {/* The thesis of the whole product, stated as an absence. */}
+      <AbsenceNote icon={Lock} title="This is everything that exists.">
+        Three fields built this record : nothing else is stored. Businesses only ever see a signed
+        YES / NO to the facts you grant, never this page.
+      </AbsenceNote>
 
       <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-        <Fingerprint className="h-3.5 w-3.5 text-gold-strong" />
+        <Fingerprint className="h-3.5 w-3.5 text-brand-400" />
         Your reference is the only thing you ever share.
       </p>
     </div>

@@ -10,8 +10,9 @@ const badgeVariants = cva(
         default: "border-transparent bg-brand-800 text-white",
         secondary: "border-transparent bg-brand-50 text-brand-800",
         outline: "border-brand-200 text-brand-800",
-        accent: "border-transparent bg-gold-soft text-gold-deep",
-        success: "border-transparent bg-gold-soft text-gold-deep",
+        accent: "border-transparent bg-gold-soft text-gold-strong",
+        // Distinct from `accent`, which it used to duplicate exactly.
+        success: "border-transparent bg-verify-soft text-verify-strong",
         warning: "border-transparent bg-amber-50 text-amber-700",
         destructive: "border-transparent bg-rose-50 text-rose-700",
         muted: "border-transparent bg-muted text-muted-foreground",

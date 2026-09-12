@@ -14,42 +14,13 @@ import {
 } from "lucide-react";
 import { LandingHeader } from "@/components/landing/header";
 import { LandingFooter } from "@/components/landing/footer";
+import { BTN_DARK, BTN_OUTLINE } from "@/components/landing/buttons";
 import { RolesSelector } from "@/components/landing/roles-selector";
 import { LiveVerify } from "@/components/landing/live-verify";
+import { CountUp } from "@/components/landing/count-up";
+import { ScrollTop } from "@/components/landing/scroll-top";
 import { Reveal } from "@/components/landing/reveal";
-
-const BTN_DARK =
-  "inline-flex items-center justify-center gap-1.5 rounded-[7px] bg-af-ink px-[18px] py-[11px] text-[14px] font-semibold text-white transition-colors hover:bg-af-dark";
-const BTN_OUTLINE =
-  "inline-flex items-center justify-center gap-1.5 rounded-[7px] border border-af-border-strong bg-transparent px-[18px] py-[11px] text-[14px] font-semibold text-af-ink transition-colors hover:border-af-ink";
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted">
-      {children}
-    </p>
-  );
-}
-
-function SectionHeading({
-  eyebrow,
-  title,
-  children,
-}: {
-  eyebrow: string;
-  title: React.ReactNode;
-  children?: React.ReactNode;
-}) {
-  return (
-    <>
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-5 font-display text-[clamp(2.2rem,4.5vw,3.6rem)] font-bold leading-[1] tracking-[-0.04em] text-af-ink">
-        {title}
-      </h2>
-      {children && <p className="mt-5 max-w-[600px] text-base leading-relaxed text-af-muted">{children}</p>}
-    </>
-  );
-}
+import { Eyebrow, SectionHeading } from "@/components/landing/section-heading";
 
 export default function HomePage() {
   const capabilities: { cat: string; title: string; body: string; icon: LucideIcon }[] = [
@@ -134,7 +105,7 @@ export default function HomePage() {
     "shadcn/ui",
     "Mock API seam",
     "Signed receipts",
-    "Row-level security · Phase 2",
+    "AES-GCM at rest",
   ];
 
   return (
@@ -145,18 +116,43 @@ export default function HomePage() {
       <section className="bg-af-bg">
         <div className="mx-auto grid max-w-[1280px] items-center gap-16 px-5 pb-20 pt-16 md:px-6 md:pb-28 md:pt-[100px] lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
           <div>
-            <Eyebrow>Privacy-first identity verification</Eyebrow>
-            <h1 className="mt-7 font-display text-[clamp(2rem,7vw,5.4rem)] font-bold leading-[0.95] tracking-[-0.045em] text-af-ink max-[480px]:leading-[1.08]">
+            <Eyebrow className="animate-rise motion-reduce:animate-none">
+              Privacy-first identity verification
+            </Eyebrow>
+            <h1
+              className="mt-7 animate-rise font-display text-[clamp(2rem,7vw,5.4rem)] font-bold leading-[1.05] tracking-[-0.045em] text-af-ink motion-reduce:animate-none max-[480px]:leading-[1.08]"
+              style={{ animationDelay: "90ms" }}
+            >
               Prove a fact.
               <br />
-              <span className="text-af-accent">Not the whole record.</span>
+              {/* Gold as a field, not as text. As text it measured 1.51:1 on this
+                  ground; as a marker behind near-black ink it is 11:1, and at this
+                  size the colour reads louder than it ever did in thin strokes.
+                  leading is 1.05 so the band clears the glyphs.
+
+                  The field wipes in rather than simply being there — see
+                  .band-wipe in globals.css for why it is a background and not an
+                  absolutely-positioned slab. Delayed past the headline's own
+                  rise, so the words land and the highlighter follows them. */}
+              <span
+                className="band-wipe animate-band rounded-[6px] px-3 text-af-ink motion-reduce:animate-none"
+                style={{ animationDelay: "500ms" }}
+              >
+                Not the whole record.
+              </span>
             </h1>
-            <p className="mt-9 max-w-[560px] text-base leading-relaxed text-af-muted">
+            <p
+              className="mt-9 max-w-[560px] animate-rise text-base leading-relaxed text-af-muted motion-reduce:animate-none"
+              style={{ animationDelay: "200ms" }}
+            >
               Quebec lets a business confirm a single fact about a customer : their age, their
               name, that their identity is verified : without ever seeing the record behind it.
               Enroll in three fields. Share one reference. Get a signed yes or no.
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-3">
+            <div
+              className="mt-10 flex animate-rise flex-wrap items-center gap-3 motion-reduce:animate-none"
+              style={{ animationDelay: "310ms" }}
+            >
               <Link href="/user/dashboard" className={BTN_DARK}>
                 <UserRound className="h-4 w-4" />
                 I&apos;m a user
@@ -168,7 +164,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="lg:pl-6">
+          <div
+            className="animate-rise motion-reduce:animate-none lg:pl-6"
+            style={{ animationDelay: "260ms" }}
+          >
             <LiveVerify />
           </div>
         </div>
@@ -188,26 +187,39 @@ export default function HomePage() {
       <section className="border-b border-af-border bg-af-surface">
         <div className="mx-auto grid max-w-[1280px] gap-y-12 px-5 py-20 md:grid-cols-4 md:divide-x md:divide-af-border md:px-6">
           {[
-            { value: "3", label: "fields to enroll : name, DOB and NIN", accent: false },
-            { value: "1", label: "reference to remember : all a business ever needs", accent: false },
-            { value: "0", label: "documents ever shown to a verifier", accent: true },
-            { value: "100%", label: "of checks logged, auditable and revocable", accent: false },
-          ].map((s) => (
-            <div
+            { value: "3", label: "fields to enroll : name, DOB and NIN", absence: false },
+            { value: "1", label: "reference to remember : all a business ever needs", absence: false },
+            { value: "0", label: "documents ever shown to a verifier", absence: true },
+            { value: "100%", label: "of checks logged, auditable and revocable", absence: false },
+          ].map((s, i) => (
+            <Reveal
               key={s.label}
+              delay={i * 90}
+              variant="zoom"
               className="flex flex-col items-center justify-center text-center md:items-start md:justify-start md:px-8 md:first:pl-0 md:text-left"
             >
-              <p
-                className={
-                  s.accent
-                    ? "font-display text-[clamp(2.6rem,4vw,3.4rem)] font-bold leading-none tracking-[-0.03em] text-af-accent"
-                    : "font-display text-[clamp(2.6rem,4vw,3.4rem)] font-bold leading-none tracking-[-0.03em] text-af-ink"
-                }
-              >
-                {s.value}
+              {/* The zero is the thesis, so it gets the product's ABSENCE mark — the
+                  dashed edge <AbsenceNote> uses — rather than a colour. It was the
+                  one gold numeral in the strip, which spent the accent on "a
+                  statistic" and left "nothing" looking like an ordinary figure.
+                  Ink plus a broken rule under it reads as the deliberate gap it
+                  is; the space around it does the rest. */}
+              <p className="font-display text-[clamp(2.6rem,4vw,3.4rem)] font-bold leading-none tracking-[-0.03em] text-af-ink">
+                {/* Counts up when it scrolls in. "0" is the one value that does
+                    nothing, which is exactly right — there is no smaller number
+                    to come up from, and the point is that it stays empty. */}
+                <CountUp value={s.value} />
               </p>
+              {s.absence ? (
+                <span
+                  aria-hidden="true"
+                  className="mt-3 h-0 w-16 border-t-2 border-dashed border-af-border-strong"
+                />
+              ) : (
+                <span aria-hidden="true" className="mt-3 h-0 w-16 border-t-2 border-transparent" />
+              )}
               <p className="mt-4 max-w-[240px] text-sm leading-relaxed text-af-muted">{s.label}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -215,14 +227,18 @@ export default function HomePage() {
       {/* ============ Capabilities ============ */}
       <section id="capabilities" className="scroll-mt-[80px] bg-af-bg">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="Capabilities" title="One reference, many safe checks">
-            The whole platform is one record and one reference. Every capability below works
-            against them : nothing else is ever created, stored or shown.
-          </SectionHeading>
+          <Reveal>
+            <SectionHeading eyebrow="Capabilities" title="One reference, many safe checks">
+              The whole platform is one record and one reference. Every capability below works
+              against them : nothing else is ever created, stored or shown.
+            </SectionHeading>
+          </Reveal>
           <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {capabilities.map((c, i) => (
-              <Reveal key={c.title} className="h-full" delay={i * 70}>
-                <div className="flex h-full flex-col rounded-[14px] border border-af-border bg-af-surface p-8 shadow-[0_1px_2px_rgba(23,23,23,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-af-border-strong hover:shadow-[0_16px_32px_rgba(23,23,23,0.09)] motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+              /* Zoom, not rise: a card is an object you pick up, so it arrives by
+                 coming forward rather than by travelling up the page. */
+              <Reveal key={c.title} className="h-full" delay={i * 70} variant="zoom">
+                <div className="flex h-full flex-col rounded-[14px] border border-af-border bg-af-surface p-8 shadow-[0_1px_2px_rgba(23,23,23,0.05)] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-af-border-strong hover:shadow-[0_16px_32px_rgba(23,23,23,0.09)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100">
                   <span className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-af-ink text-af-accent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
                     <c.icon className="h-5 w-5" strokeWidth={2} />
                   </span>
@@ -243,30 +259,41 @@ export default function HomePage() {
       {/* ============ How it works ============ */}
       <section id="how-it-works" className="scroll-mt-[80px] border-t border-af-border bg-af-surface">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="How it works" title="From enrollment to signed answer">
-            Five steps, end to end. No documents move, no data leaves, and every step is logged.
-          </SectionHeading>
+          <Reveal>
+            <SectionHeading eyebrow="How it works" title="From enrollment to signed answer">
+              Five steps, end to end. No documents move, no data leaves, and every step is logged.
+            </SectionHeading>
+          </Reveal>
           <div className="mt-16">
             {/* Desktop : horizontal five-step process */}
             <div className="hidden gap-8 md:grid md:grid-cols-5">
-              {steps.map((s) => (
-                <div key={s.n} className="border-t-2 border-af-border pt-6">
-                  <p className="font-mono text-sm text-af-accent">{s.n}</p>
+              {steps.map((s, i) => (
+                <Reveal key={s.n} delay={i * 110} variant="left">
+                  {/* The rule draws itself in, left to right. This section is a
+                      sequence, so the marks separating the steps arrive in
+                      sequence too — and each one draws in the direction the
+                      steps are read. See .rule-draw in globals.css. */}
+                  <span
+                    aria-hidden="true"
+                    className="rule-draw block h-0.5 w-full bg-af-border"
+                    style={{ transitionDelay: `${i * 110}ms` }}
+                  />
+                  <p className="mt-6 font-mono text-sm text-af-muted">{s.n}</p>
                   <h3 className="mt-4 text-lg font-semibold tracking-[-0.01em] text-af-ink">
                     {s.title}
                   </h3>
                   <p className="mt-2 max-w-[240px] text-sm leading-relaxed text-af-muted">
                     {s.body}
                   </p>
-                </div>
+                </Reveal>
               ))}
             </div>
             {/* Mobile : vertical with down arrows */}
             <div className="md:hidden">
               {steps.map((s, i) => (
-                <div key={s.n}>
+                <Reveal key={s.n} delay={i * 80}>
                   <div className="flex gap-5">
-                    <p className="shrink-0 font-mono text-sm text-af-accent">{s.n}</p>
+                    <p className="shrink-0 font-mono text-sm text-af-muted">{s.n}</p>
                     <div>
                       <h3 className="text-lg font-semibold tracking-[-0.01em] text-af-ink">
                         {s.title}
@@ -281,7 +308,7 @@ export default function HomePage() {
                       <ArrowDown className="h-4 w-4 text-af-muted-2" />
                     </div>
                   )}
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -291,21 +318,25 @@ export default function HomePage() {
       {/* ============ Roles ============ */}
       <section id="roles" className="scroll-mt-[80px] border-t border-af-border bg-af-bg">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="Roles" title="One reference, three points of view">
-            What each side of a check actually sees : and nothing else.
-          </SectionHeading>
-          <div className="mt-12">
+          <Reveal>
+            <SectionHeading eyebrow="Roles" title="One reference, three points of view">
+              What each side of a check actually sees : and nothing else.
+            </SectionHeading>
+          </Reveal>
+          <Reveal className="mt-12" variant="zoom" delay={80}>
             <RolesSelector />
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ============ Why minimal disclosure ============ */}
       <section className="border-t border-af-border bg-af-surface">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="Why a yes?" title="Minimal disclosure, by design">
-            Quebec answers exactly what is asked : and nothing more. That is the whole point.
-          </SectionHeading>
+          <Reveal>
+            <SectionHeading eyebrow="Why a yes?" title="Minimal disclosure, by design">
+              Quebec answers exactly what is asked : and nothing more. That is the whole point.
+            </SectionHeading>
+          </Reveal>
           <div className="mt-16 grid gap-px overflow-hidden rounded-[10px] border border-af-border bg-af-border md:grid-cols-3">
             {[
               {
@@ -323,19 +354,21 @@ export default function HomePage() {
                 title: "Signed and re-checkable",
                 body: "Every answer carries a signature a shop or a regulator can verify : without the record behind it.",
               },
-            ].map((b) => (
-              <div
-                key={b.title}
-                className="bg-af-surface p-8 transition-colors duration-300 hover:bg-af-surface-muted"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-af-muted">
-                  {b.cat}
-                </p>
-                <h3 className="mt-5 text-[20px] font-semibold tracking-[-0.02em] text-af-ink">
-                  {b.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-af-muted">{b.body}</p>
-              </div>
+            ].map((b, i) => (
+              /* bg on the wrapper as well as the panel — the grid draws its
+                 hairlines with gap-px over a bg-af-border ground, so a
+                 transparent wrapper would flash grey as the panel fades in. */
+              <Reveal key={b.title} delay={i * 110} className="bg-af-surface" variant="left">
+                <div className="h-full bg-af-surface p-8 transition-colors duration-300 hover:bg-af-surface-muted">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-af-muted">
+                    {b.cat}
+                  </p>
+                  <h3 className="mt-5 text-[20px] font-semibold tracking-[-0.02em] text-af-ink">
+                    {b.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-af-muted">{b.body}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -344,26 +377,32 @@ export default function HomePage() {
       {/* ============ Checks (rate card) ============ */}
       <section id="checks" className="scroll-mt-[80px] border-t border-af-border bg-af-bg">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="Checks" title="Common checks, rate-card simple">
-            Every check a business might run. One reference unlocks them all : instantly, signed,
-            and logged.
-          </SectionHeading>
+          <Reveal>
+            <SectionHeading eyebrow="Checks" title="Common checks, rate-card simple">
+              Every check a business might run. One reference unlocks them all : instantly, signed,
+              and logged.
+            </SectionHeading>
+          </Reveal>
           <div className="mt-16 grid gap-px overflow-hidden rounded-[10px] border border-af-border bg-af-border sm:grid-cols-2 lg:grid-cols-4">
-            {checks.map((c) => (
-              <div
-                key={c.code}
-                className="flex flex-col bg-af-surface p-7 transition-colors duration-300 hover:bg-af-surface-muted"
-              >
-                <p className="font-mono text-[12px] text-af-muted-2">{c.code}</p>
-                <h3 className="mt-4 text-lg font-semibold tracking-[-0.01em] text-af-ink">
-                  {c.title}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-af-muted">{c.desc}</p>
-                <p className="mt-6 flex items-center gap-1.5 text-[12px] font-medium text-af-accent">
-                  <span className="h-1.5 w-1.5 rounded-full bg-af-accent" aria-hidden="true" />
-                  Signed · instant
-                </p>
-              </div>
+            {checks.map((c, i) => (
+              /* bg on the Reveal as well as the card: the grid paints hairlines
+                 with gap-px over a bg-af-border ground, so a transparent wrapper
+                 would flash grey behind each card as it fades up. */
+              <Reveal key={c.code} delay={i * 80} className="bg-af-surface" variant="zoom">
+                <div className="flex h-full flex-col bg-af-surface p-7 transition-colors duration-300 hover:bg-af-surface-muted">
+                  <p className="font-mono text-[12px] text-af-muted">{c.code}</p>
+                  <h3 className="mt-4 text-lg font-semibold tracking-[-0.01em] text-af-ink">
+                    {c.title}
+                  </h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-af-muted">{c.desc}</p>
+                  {/* Was gold text on a gold dot. This is an eyebrow and a bullet —
+                      neither is one of gold's three jobs. */}
+                  <p className="mt-6 flex items-center gap-1.5 text-[12px] font-medium text-af-muted">
+                    <span className="h-1.5 w-1.5 rounded-full bg-af-ink" aria-hidden="true" />
+                    Signed · instant
+                  </p>
+                </div>
+              </Reveal>
             ))}
           </div>
           <p className="mt-6 text-[13px] text-af-muted">
@@ -376,14 +415,18 @@ export default function HomePage() {
       {/* ============ Pricing ============ */}
       <section id="pricing" className="scroll-mt-[80px] border-t border-af-border bg-af-surface">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="Pricing" title="Simple, per-verification pricing">
-            One reference, one price per check. No tiers, no contracts : only what you verify.
-          </SectionHeading>
+          <Reveal>
+            <SectionHeading eyebrow="Pricing" title="Simple, per-verification pricing">
+              One reference, one price per check. No tiers, no contracts : only what you verify.
+            </SectionHeading>
+          </Reveal>
           <div className="mt-14 grid gap-6 lg:grid-cols-2">
-            {/* Pilot : free during the pilot */}
-            <Reveal className="h-full">
-              <div className="flex h-full flex-col border-2 border-af-border-strong bg-af-surface p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(23,23,23,0.08)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:p-12">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted-2">
+            {/* Pilot : free during the pilot. The two plans converge from
+                opposite sides — they are being compared, so they arrive facing
+                each other. */}
+            <Reveal className="h-full" variant="left">
+              <div className="flex h-full flex-col border-2 border-af-border-strong bg-af-surface p-10 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-[0_16px_32px_rgba(23,23,23,0.08)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 md:p-12">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted">
                   Pilot
                 </p>
                 <p className="mt-6 font-display text-[clamp(2.6rem,5vw,3.6rem)] font-bold leading-none tracking-[-0.03em] text-af-ink">
@@ -403,7 +446,11 @@ export default function HomePage() {
                     "Dedicated demo onboarding",
                   ].map((li) => (
                     <li key={li} className="flex items-start gap-3 text-sm text-af-ink">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-af-accent" />
+                      {/* An "included" tick is the system attesting to the plan's
+                          own integrity, which is green's axis — not gold's. Gold
+                          was also doing "step numeral" on this page; both are off
+                          the list now. */}
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-verify" />
                       {li}
                     </li>
                   ))}
@@ -416,9 +463,9 @@ export default function HomePage() {
             </Reveal>
 
             {/* Launch : per-verification, after the pilot */}
-            <Reveal className="h-full" delay={120}>
-              <div className="flex h-full flex-col border border-af-border bg-af-surface p-10 transition-all duration-300 hover:-translate-y-1 hover:border-af-border-strong hover:shadow-[0_16px_32px_rgba(23,23,23,0.08)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:p-12">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted-2">
+            <Reveal className="h-full" delay={120} variant="right">
+              <div className="flex h-full flex-col border border-af-border bg-af-surface p-10 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-af-border-strong hover:shadow-[0_16px_32px_rgba(23,23,23,0.08)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 md:p-12">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-af-muted">
                   Launch
                 </p>
                 <p className="mt-6 font-display text-[clamp(2.6rem,5vw,3.6rem)] font-bold leading-none tracking-[-0.03em] text-af-ink">
@@ -438,7 +485,7 @@ export default function HomePage() {
                     "Team dashboard when the API ships",
                   ].map((li) => (
                     <li key={li} className="flex items-start gap-3 text-sm text-af-ink">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-af-accent" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-verify" />
                       {li}
                     </li>
                   ))}
@@ -459,18 +506,21 @@ export default function HomePage() {
       {/* ============ Built on ============ */}
       <section id="built-on" className="scroll-mt-[80px] border-t border-af-border bg-af-bg">
         <div className="mx-auto max-w-[1280px] px-5 py-24 md:px-6">
-          <SectionHeading eyebrow="Built on" title="The stack under the demo">
-            A single mock-API seam stands in for every backend call : so the UI you see is the
-            UI that ships.
-          </SectionHeading>
+          <Reveal>
+            <SectionHeading eyebrow="Built on" title="The stack under the demo">
+              A single mock-API seam stands in for every backend call : so the UI you see is the
+              UI that ships.
+            </SectionHeading>
+          </Reveal>
           <div className="mt-10 flex flex-wrap gap-2.5">
-            {builtOn.map((t) => (
-              <span
-                key={t}
-                className="rounded-[6px] border border-af-border bg-af-surface px-3 py-1.5 font-mono text-[12px] text-af-muted"
-              >
-                {t}
-              </span>
+            {/* Chips pop in one after another — a short, low stagger, because a
+                tag cloud has no reading order worth pacing. */}
+            {builtOn.map((t, i) => (
+              <Reveal key={t} delay={i * 45} variant="zoom" className="flex">
+                <span className="inline-block rounded-[6px] border border-af-border bg-af-surface px-3 py-1.5 font-mono text-[12px] text-af-muted transition-colors duration-300 hover:border-af-border-strong hover:text-af-ink">
+                  {t}
+                </span>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -479,29 +529,36 @@ export default function HomePage() {
       {/* ============ Final CTA ============ */}
       <section className="border-t border-af-border bg-af-surface">
         <div className="mx-auto max-w-[1280px] px-5 py-28 md:px-6">
-          <h2 className="max-w-[820px] font-display text-[clamp(2.4rem,5vw,4.4rem)] font-bold leading-[1] tracking-[-0.04em] text-af-ink">
-            Verify a fact.
-            <br />
-            Keep the whole record.
-          </h2>
-          <p className="mt-7 max-w-[600px] text-base leading-relaxed text-af-muted">
-            Enroll an identity, share a reference, verify a fact, watch the access log : then
-            take the access back. Two minutes, end to end.
-          </p>
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <Link href="/user/dashboard" className={BTN_DARK}>
-              <UserRound className="h-4 w-4" />
-              I&apos;m a user
-            </Link>
-            <Link href="/business/dashboard" className={BTN_OUTLINE}>
-              <Building2 className="h-4 w-4" />
-              I&apos;m a business
-            </Link>
-          </div>
+          <Reveal>
+            <h2 className="max-w-[820px] font-display text-[clamp(2.4rem,5vw,4.4rem)] font-bold leading-[1] tracking-[-0.04em] text-af-ink">
+              Verify a fact.
+              <br />
+              Keep the whole record.
+            </h2>
+          </Reveal>
+          <Reveal delay={120}>
+            <p className="mt-7 max-w-[600px] text-base leading-relaxed text-af-muted">
+              Enroll an identity, share a reference, verify a fact, watch the access log : then
+              take the access back. Two minutes, end to end.
+            </p>
+          </Reveal>
+          <Reveal delay={220} className="mt-10">
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/user/dashboard" className={BTN_DARK}>
+                <UserRound className="h-4 w-4" />
+                I&apos;m a user
+              </Link>
+              <Link href="/business/dashboard" className={BTN_OUTLINE}>
+                <Building2 className="h-4 w-4" />
+                I&apos;m a business
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </section>
 
       <LandingFooter />
+      <ScrollTop />
     </div>
   );
 }

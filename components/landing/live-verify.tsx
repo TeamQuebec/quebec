@@ -32,7 +32,7 @@ export function LiveVerify() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-af-accent opacity-60" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-af-accent" />
           </span>
-          <span className="text-af-accent">live</span>
+          <span className="text-af-accent-strong">live</span>
         </p>
         <span className="h-4 w-px bg-af-border" aria-hidden="true" />
         <p className="text-[14px] font-medium text-af-muted">
@@ -50,7 +50,15 @@ export function LiveVerify() {
                   key={s}
                   className={cn(
                     "whitespace-nowrap text-[12px] font-semibold uppercase tracking-[0.08em] transition-colors duration-300",
-                    i === active ? "text-af-accent" : "text-af-muted-2"
+                    // Ink, not gold. The active step was gold on white (1.63:1) and
+                    // the inactive ones were mid-grey, so the "which step is it on"
+                    // cue was carried by a near-invisible difference. Near-black
+                    // against the grey is a cue you can actually see.
+                    //
+                    // The inactive step is af-muted (5.9:1), not af-muted-2 (3.3:1)
+                    // — at 12px this is body text and needs the AA bar, and the gap
+                    // to near-black is still wide enough to read as "not this one".
+                    i === active ? "text-af-ink" : "text-af-muted"
                   )}
                 >
                   {s}
@@ -61,31 +69,28 @@ export function LiveVerify() {
         </div>
       </div>
 
-      {/* Connector : pipeline ↓ verdict */}
-      <svg
-        className="my-5 ml-[3px]"
-        width="10"
-        height="36"
-        viewBox="0 0 10 36"
-        fill="none"
-        aria-hidden="true"
-      >
-        <line x1="4" y1="4" x2="4" y2="32" stroke="var(--af-border)" strokeWidth="1" />
-        <circle cx="4" cy="4" r="2.5" fill="var(--af-ink)" />
-        <circle cx="4" cy="32" r="2.5" fill="var(--af-accent)" />
-        <circle cx="4" cy="18" r="2" fill="var(--af-accent)">
-          <animate attributeName="cy" values="6;30" dur="1.8s" repeatCount="indefinite" />
-        </circle>
-      </svg>
+      {/* Rail : the pipeline running out into the answer. Horizontal, because
+          that is the direction the check actually travels — the pipeline above
+          carries left to right, so a rail that dropped vertically made the
+          flow turn a corner to reach a verdict sitting directly beneath it.
+          Ink at the start, gold at the landing, and the pulse between them. */}
+      <div className="my-5 flex items-center" aria-hidden="true">
+        <span className="h-2 w-2 shrink-0 rounded-full bg-af-ink" />
+        <span className="relative h-px flex-1 bg-af-border">
+          <span className="rail-dot" />
+        </span>
+        <span className="h-2 w-2 shrink-0 rounded-full bg-af-accent" />
+      </div>
 
-      {/* Verdict */}
+      {/* Verdict. Gold in text on this ground is 1.51:1, so the answer takes the
+          dark step — the same one the portal's YES chips use for their label. */}
       <p className="font-display text-[clamp(1.75rem,2.8vw,2.4rem)] font-bold leading-none tracking-[-0.03em] text-af-ink">
-        Signed <span className="text-af-accent">YES</span>
+        Signed <span className="text-af-accent-strong">YES</span>
       </p>
 
       {/* Receipt on the record */}
       <div className="mt-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-af-muted-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-af-muted">
           On the record · Receipt
         </p>
         <p className="mt-1 font-mono text-[12px] text-af-muted">VFY-4N7C-2Q</p>

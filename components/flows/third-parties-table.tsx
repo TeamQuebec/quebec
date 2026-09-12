@@ -101,7 +101,7 @@ export function ThirdPartiesTable() {
           ·{" "}
           <a
             href="/user/third-parties"
-            className="font-medium text-gold-strong hover:underline"
+            className="font-medium text-brand-900 hover:underline"
           >
             show all
           </a>

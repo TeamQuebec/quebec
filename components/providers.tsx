@@ -8,13 +8,25 @@ import { Footer } from "@/components/site/footer";
 import { Toaster } from "@/components/ui/sonner";
 
 export function Providers({ children }: { children: ReactNode }) {
-  // The landing page renders its own Quebec-style header/footer, and the portal
-  // pages (/user, /business) own their chrome via the AppShell sidebar : so the
-  // global TopNav/Footer only appear on the pages between.
+  // The chrome rule, stated once so it stops being accidental:
+  //
+  //   1280px + LandingHeader/Footer = public marketing   (/ , /how-it-works)
+  //   1024px + AppShell sidebar     = the app            (/user/*, /business/*, /receipt/*)
+  //    672px + neither               = a document         (/auth)
+  //
+  // A page is now either obviously in a system or obviously out of one. If you
+  // add a page, pick one of the three; don't invent a fourth.
   const pathname = usePathname();
-  const isLanding = pathname === "/";
-  const isPortal = pathname.startsWith("/user") || pathname.startsWith("/business");
-  const showGlobalChrome = !isLanding && !isPortal;
+  const isMarketing = pathname === "/" || pathname.startsWith("/how-it-works");
+  const isPortal =
+    pathname.startsWith("/user") ||
+    pathname.startsWith("/business") ||
+    pathname.startsWith("/receipt");
+  // /auth is a document: it brings its own brand mark and its own narrow column,
+  // so the global TopNav put a second Logo directly above the first. Neither
+  // chrome renders there.
+  const isDocument = pathname.startsWith("/auth");
+  const showGlobalChrome = !isMarketing && !isPortal && !isDocument;
 
   return (
     <AppProvider>

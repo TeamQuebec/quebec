@@ -31,9 +31,12 @@ export function buildActivityPoints(isoTimes: string[]): ActivityPoint[] {
 }
 
 /**
- * Lightweight 7-day activity bar chart : no chart library. Thin gold bars with
- * rounded tops anchored to a shared baseline, a hover tooltip per bar, and the
- * current day emphasized in dark ink. Single series, so no legend is needed.
+ * Lightweight 7-day activity bar chart : no chart library. Thin warm-grey bars
+ * with rounded tops anchored to a shared baseline, a hover tooltip per bar, and
+ * the current day emphasized in dark ink. Single series, so no legend is needed.
+ *
+ * The bars were gold, which is the colour of the ANSWER. A bar is a count, not a
+ * verdict, so it takes the neutral ramp and lets ink carry "today".
  */
 export function ActivityChart({ data }: { data: ActivityPoint[] }) {
   const max = Math.max(1, ...data.map((d) => d.value));
@@ -76,7 +79,7 @@ export function ActivityChart({ data }: { data: ActivityPoint[] }) {
                 <div
                   className={cn(
                     "w-full rounded-t transition-opacity",
-                    d.isToday ? "bg-brand-800" : "bg-gold",
+                    d.isToday ? "bg-brand-800" : "bg-brand-300",
                     d.value > 0 && "group-hover:opacity-75"
                   )}
                   style={{ height: `${height}%` }}

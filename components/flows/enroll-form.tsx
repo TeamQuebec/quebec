@@ -20,6 +20,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CopyButton } from "@/components/site/copy-button";
+import { AbsenceNote } from "@/components/site/absence-note";
 import { useApp } from "@/state/app-context";
 import { SYNTHETIC_USERS } from "@/lib/mockData/users";
 import { computeAge, formatDateTime } from "@/lib/format";
@@ -57,8 +58,9 @@ function FlowStep({ n, title, active, done }: { n: string; title: string; active
       <span
         className={cn(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
+          // Completed is a state, so it is ink like the active step — not gold.
           done
-            ? "border-gold bg-gold text-af-ink"
+            ? "border-brand-900 bg-brand-900 text-white"
             : active
               ? "border-brand-800 bg-brand-800 text-white"
               : "border-brand-200 bg-white text-brand-400"
@@ -159,11 +161,10 @@ export function EnrollForm() {
     return (
       <div className="animate-fade-up">
         <Card className="overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-brand-700 via-gold to-gold" />
           <CardContent className="p-8 sm:p-10">
             <div className="flex flex-col items-center text-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-soft ring-8 ring-gold-soft/50">
-                <PartyPopper className="h-7 w-7 text-gold-strong" />
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-verify-soft ring-8 ring-verify-soft/50">
+                <PartyPopper className="h-7 w-7 text-verify-strong" />
               </span>
               <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-brand-950">
                 Your identity reference is ready
@@ -180,7 +181,7 @@ export function EnrollForm() {
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">
                 Save this now : it&apos;s your permanent reference
               </p>
-              <p className="ref-plate mt-2 text-3xl font-semibold tracking-wider text-brand-950">
+              <p className="ref-plate mt-2 text-3xl font-semibold text-brand-950">
                 {identity.uniqueId}
               </p>
               <p className="mt-2 text-xs leading-relaxed text-amber-800">
@@ -236,7 +237,6 @@ export function EnrollForm() {
       </div>
 
       <Card className="overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-brand-700 to-gold" />
         <CardContent className="p-6 sm:p-8">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -249,7 +249,7 @@ export function EnrollForm() {
               </p>
             </div>
             <Button type="button" variant="ghost" size="sm" className="shrink-0" onClick={fillDemo}>
-              <Sparkles className="h-4 w-4 text-gold-strong" />
+              <Sparkles className="h-4 w-4 text-brand-400" />
               Try a demo identity
             </Button>
           </div>
@@ -272,13 +272,15 @@ export function EnrollForm() {
                   aria-invalid={!!errName}
                   className={cn(
                     "pr-10",
-                    errName
-                      ? "border-rose-400 focus-visible:ring-rose-400/40"
-                      : touched.name && name && "border-gold-strong"
+                    errName && "border-rose-400 focus-visible:ring-rose-400/40"
                   )}
                 />
                 {!errName && touched.name && name && (
-                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gold-strong" />
+                  // Green on the tick only. The field's border used to go gold
+                  // when valid, so a correctly-filled input was the same colour
+                  // as a verified YES — and the default border is already the
+                  // valid state, so the border needed no colour at all.
+                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-verify" />
                 )}
               </div>
               {errName ? (
@@ -305,15 +307,13 @@ export function EnrollForm() {
                 max={new Date().toISOString().slice(0, 10)}
                 aria-invalid={!!errDob}
                 className={cn(
-                  errDob
-                    ? "border-rose-400 focus-visible:ring-rose-400/40"
-                    : touched.dob && dob && "border-gold-strong"
+                  errDob && "border-rose-400 focus-visible:ring-rose-400/40"
                 )}
               />
               {errDob ? (
                 <p className="text-xs text-rose-600">{errDob}</p>
               ) : touched.dob && dob ? (
-                <p className="flex items-center gap-1 text-xs text-gold-strong">
+                <p className="flex items-center gap-1 text-xs text-verify-strong">
                   <Check className="h-3 w-3" />
                   Looks good
                 </p>
@@ -338,13 +338,11 @@ export function EnrollForm() {
                   aria-invalid={!!errNin}
                   className={cn(
                     "ref-plate pr-10",
-                    errNin
-                      ? "border-rose-400 focus-visible:ring-rose-400/40"
-                      : touched.nin && nin.replace(/\D/g, "").length === 11 && "border-gold-strong"
+                    errNin && "border-rose-400 focus-visible:ring-rose-400/40"
                   )}
                 />
                 {!errNin && touched.nin && nin.replace(/\D/g, "").length === 11 && (
-                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gold-strong" />
+                  <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-verify" />
                 )}
               </div>
               {errNin ? (
@@ -357,15 +355,13 @@ export function EnrollForm() {
               )}
             </div>
 
-            {/* What happens to this data next */}
-            <div className="flex items-start gap-2.5 rounded-lg border border-gold-border bg-gold-soft/50 px-3.5 py-3">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold-strong" />
-              <p className="text-xs leading-relaxed text-brand-800">
-                Your details are stored <span className="font-semibold">encrypted</span> and are
-                never shown raw to verifiers : they only ever receive the signed YES / NO answer
-                to the checks you allow.
-              </p>
-            </div>
+            {/* What happens to this data next : an absence claim, so it gets the
+                dashed register rather than an accent-tinted aside. */}
+            <AbsenceNote icon={ShieldCheck}>
+              Your details are sealed with <span className="font-semibold">AES-GCM</span> before they
+              touch storage, and are never shown raw to verifiers : they only ever receive the signed
+              YES / NO answer to the checks you allow.
+            </AbsenceNote>
 
             <Button
               type="submit"

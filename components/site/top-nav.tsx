@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Menu, ShieldCheck } from "lucide-react";
+import { Menu, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { ModeSwitch, modeFromPath } from "@/components/site/mode-switch";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ function NavLinks({ links, pathname }: { links: NavLink[]; pathname: string }) {
           >
             {l.label}
             {active && (
-              <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-gold" />
+              <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-brand-900" />
             )}
           </Link>
         );
@@ -66,7 +66,7 @@ export function TopNav() {
           <Logo />
           {mode && (
             <span className="hidden items-center gap-1.5 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-medium text-brand-800 sm:inline-flex">
-              <ShieldCheck className="h-3.5 w-3.5 text-gold-strong" />
+              <ShieldCheck className="h-3.5 w-3.5 text-brand-500" />
               {mode === "user" ? "User portal" : "Business portal"}
             </span>
           )}
@@ -75,12 +75,6 @@ export function TopNav() {
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
           <NavLinks links={links} pathname={pathname} />
-          {mode === "business" && (
-            <span className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-800">
-              <Building2 className="h-3.5 w-3.5 text-brand-500" />
-              Signed in as SafeBank NG
-            </span>
-          )}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
@@ -115,12 +109,6 @@ export function TopNav() {
                     </Link>
                   ))}
                 </div>
-                {mode === "business" && (
-                  <p className="inline-flex items-center gap-2 rounded-lg bg-brand-50 px-3 py-2.5 text-xs text-brand-800">
-                    <Building2 className="h-4 w-4 text-brand-500" />
-                    Verifying as SafeBank NG (demo)
-                  </p>
-                )}
                 <div className="border-t border-border pt-4">
                   <p className="mb-2 px-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Switch portal

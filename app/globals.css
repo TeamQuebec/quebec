@@ -24,7 +24,10 @@
   --destructive-foreground: #ffffff;
   --border: #dcddd8;
   --input: #cfd1c9;
-  --ring: #dcc76a;
+  /* Focus ring. Was #dcc76a, which measured 1.69:1 against a white card —
+     well under the 3:1 non-text minimum, so keyboard focus was invisible.
+     Uses the accent's dark step, which clears it comfortably. */
+  --ring: #8a6300;
   --radius: 0.6rem;
 }
 
@@ -44,6 +47,12 @@
   --af-border-strong: #c6c8c1;
   --af-accent: #f4c542;
   --af-accent-soft: #fff4c7;
+  /* The landing's text/icon step, mirroring --color-gold-strong. Gold as a FIELD
+     (#f4c542 behind dark ink) is superb — 11:1. Gold as TEXT on a light ground is
+     1.5:1, which is where the landing was using it: the hero's second line, the
+     "0 documents" stat, the step numbers, the "live" dot's label. Same value as
+     the portal's step, so the two palettes stay in step. */
+  --af-accent-strong: #8a6300;
   --af-dark: #171717;
   --af-dark-muted: #23231f;
 }
@@ -91,16 +100,69 @@
   --color-brand-500: #7c8077;
   --color-brand-600: #626560;
   --color-brand-700: #3f423c;
-  --color-brand-800: #171717;
-  --color-brand-900: #171717;
-  --color-brand-950: #171717;
+  /* The dark end used to be three copies of #171717, so every gradient built
+     from 800/900/950 rendered as one flat black and the ramp was imaginary.
+     These are real, warm steps — a gradient across them now reads as depth. */
+  --color-brand-800: #26251f;
+  --color-brand-900: #181712;
+  --color-brand-950: #0e0d0a;
 
-  /* Quebec gold accent scale — the signature accent, used sparingly */
+  /*
+   * THE COLOUR GRAMMAR. Three hues, three jobs, and nothing is allowed to take a
+   * job that isn't its own. Read this before adding a colour to anything.
+   *
+   *   GOLD  = the brand mark, the ANSWER, and the receipt seal. Three jobs, full
+   *           stop. Gold marks a thing that is PRESENT and was decided: the mark
+   *           on the door, YES/NO/PARTIAL coming back, the stamp on the receipt.
+   *           It used to mean eight things — links, eyebrows, selected state,
+   *           "Current" status, decorative card rails, form validation — and a
+   *           hue that means eight things means none of them. In particular it
+   *           meant both "the answer is yes" and "you ticked a box", so the
+   *           product's most important semantic was drawn in the same ink as a
+   *           form control. Never use gold for a link, an eyebrow, an icon chip,
+   *           a selection, or a border.
+   *
+   *   GREEN = the system attesting to its own integrity. A signature that
+   *           checked out, a step that completed, a copy that landed, a field
+   *           that validated. This is a DIFFERENT AXIS from gold: gold is what
+   *           the vault answered, green is whether you can trust the artifact
+   *           that carries the answer. Never green an answer — a NO is a
+   *           perfectly good answer and stays rose.
+   *
+   *   INK   = everything structural. Links, eyebrows, icons, selected state,
+   *           nav, status, decoration. The warm greys and near-blacks are the
+   *           default and the burden of proof is on any other colour.
+   *
+   *   DASHED BORDER = an ABSENCE. This product's actual claim is a negative one:
+   *           the record did not travel, the data is not stored, there is
+   *           nothing to leak. Absence was being styled in the same tinted box
+   *           as an ordinary aside, which turned the thesis into boilerplate.
+   *           It now gets the dashed edge the empty states already use, on a
+   *           bare ground, with no tint and no accent: the one box in the
+   *           product that is deliberately not filled in. See `<AbsenceNote>`.
+   */
+
+  /* Quebec gold accent scale — the signature accent, used sparingly.
+     gold-strong is the text/icon step: it has to clear 4.5:1 on white AND on
+     gold-soft, which #a5760a (4.04:1 / 3.66:1) did not.
+     Gold as a FIELD (#f4c542 behind ink, 11:1) is excellent. Gold as TEXT on a
+     light ground is 1.5:1 and is never the answer — that is what gold-strong is
+     for. There is no mid-gold that clears 4.5:1 as text; the hue is intrinsically
+     light, so the field/dark-step split is the fix, not a workaround. */
   --color-gold: #f4c542;
-  --color-gold-strong: #a5760a;
-  --color-gold-deep: #8a6300;
+  --color-gold-strong: #8a6300;
   --color-gold-soft: #fff4c7;
   --color-gold-border: #ecda97;
+
+  /* Verification green — the system attesting to its own integrity: a signature
+     that checked out, a step that completed, a receipt that is signed. It is a
+     different axis from the gold accent, which carries the ANSWER (yes / no /
+     partial) and the brand. Keeping them separate is what stops "the fact is
+     true" and "this artifact is trustworthy" from meaning the same colour. */
+  --color-verify: #16794c;
+  --color-verify-strong: #0d5231;
+  --color-verify-soft: #e8f5ee;
+  --color-verify-border: #b5dcc6;
 
   /* AfriFleet-style landing palette (raw tokens in :root) */
   --color-af-bg: var(--af-bg);
@@ -112,6 +174,7 @@
   --color-af-border: var(--af-border);
   --color-af-border-strong: var(--af-border-strong);
   --color-af-accent: var(--af-accent);
+  --color-af-accent-strong: var(--af-accent-strong);
   --color-af-accent-soft: var(--af-accent-soft);
   --color-af-dark: var(--af-dark);
   --color-af-dark-muted: var(--af-dark-muted);
@@ -169,6 +232,45 @@
       transform: translateX(-50%);
     }
   }
+
+  /* Landing entrance. A longer, softer rise than --animate-fade-up : this one
+     plays on first paint, above the fold, where the eye is already watching, so
+     it can afford ~0.8s and settle rather than snap. Opacity and transform only,
+     so the whole sequence stays on the compositor. */
+  --animate-rise: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* The hero's gold band. Wipes out from the left edge of the words it sits
+     behind — which is how a highlighter actually moves — rather than the whole
+     slab landing at once.
+
+     Animated as background-size, not transform. The span wraps to two lines
+     below ~400px, and the two obvious alternatives both break there: scaling an
+     element that contains the glyphs stretches the letters with it, and putting
+     an absolutely-positioned band behind `inline-block` text stops the text
+     wrapping at all and overflows the gutter instead. A background can only
+     paint inside the box the text already occupies, so it degrades to one
+     highlight per line and nothing else can go wrong. */
+  --animate-band: band 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes band {
+    from {
+      background-size: 0% 100%;
+    }
+    to {
+      background-size: 100% 100%;
+    }
+  }
 }
 
 @layer base {
@@ -196,14 +298,61 @@
   ::selection {
     background-color: color-mix(in srgb, #f4c542 30%, transparent);
   }
+
+  /*
+   * Scrollbars. Windows draws a 17px grey slab with stepper arrows, which on a
+   * four-row table looks like a piece of the OS leaked into the page. This
+   * replaces it everywhere — horizontal and vertical — with a 5px rounded thumb
+   * on a bare track, in the warm greys rather than the system grey, so a table
+   * that scrolls sideways doesn't announce itself before you need it.
+   *
+   * The two engines need different properties and they do not mix: Chrome drops
+   * every ::-webkit-scrollbar rule the moment `scrollbar-width` is set on the
+   * same element, and would hand back an 11px bar instead of a 5px one. So the
+   * standard properties are fenced behind a support test only Firefox passes.
+   */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #c2c5bc;
+    border-radius: 999px;
+    transition: background-color 150ms ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #7c8077;
+  }
+
+  /* No stepper arrows, no track-jump — the bar is a position indicator, not a
+     control panel. */
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #c2c5bc transparent;
+    }
+  }
 }
 
 @layer utilities {
-  /* Subtle blueprint grid used on hero / trust sections */
+  /* Subtle blueprint grid used on hero / trust sections.
+     Was drawn with #1a2f47 — a navy, left over from a palette this file no
+     longer contains. It read as a cool cast on a warm ground. */
   .bg-grid {
     background-image:
-      linear-gradient(to right, color-mix(in srgb, #1a2f47 5%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in srgb, #1a2f47 5%, transparent) 1px, transparent 1px);
+      linear-gradient(to right, color-mix(in srgb, #26251f 5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, #26251f 5%, transparent) 1px, transparent 1px);
     background-size: 44px 44px;
   }
 
@@ -217,6 +366,18 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Hides the native bar so a custom one can be drawn in its place. Both the
+     standard property and the WebKit pseudo-element are set: they agree here
+     (unlike a width override, which Chrome would ignore once the property is
+     present), so there is no precedence trap. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   .no-print {
@@ -248,6 +409,13 @@
   }
 
   /* Mono "reference plate" */
+  /* A reference is set identically everywhere it appears : mono, 0.08em.
+     Never pair this with a `tracking-*` utility. Both are single-class rules
+     in this same layer, so they have equal specificity and the winner is
+     decided by source order — meaning the spacing of the one string the whole
+     product is about would depend on the order Tailwind happened to emit two
+     rules. Four call sites had `tracking-wider`/`tracking-widest` on top of
+     this, left over from before the class existed; they now carry none. */
   .ref-plate {
     font-family: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
     letter-spacing: 0.08em;
@@ -285,5 +453,113 @@
       animation: none;
       opacity: 0;
     }
+  }
+
+  /*
+   * The dot that travels the hero's verdict rail. The rail itself is two flex
+   * spans and a hairline; this is the pulse running along it, left to right,
+   * from the ink endpoint to the gold one.
+   *
+   * `left` rather than `transform`, because the distance is the rail's own
+   * fluid width and a percentage translate resolves against the DOT, not the
+   * track. One 8px element repainting over 1.8s is not worth contorting the
+   * layout to avoid. The fade at each end is what makes it read as a check
+   * arriving rather than a dot teleporting back to the start.
+   */
+  .rail-dot {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 8px;
+    width: 8px;
+    border-radius: 999px;
+    background: var(--af-accent);
+    transform: translate(-50%, -50%);
+    animation: qbc-rail 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  @keyframes qbc-rail {
+    0% {
+      left: 0%;
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
+
+  /* Same treatment as .scan-line : this is the only element carrying "the check
+     is moving", and with motion suppressed the two endpoint dots still describe
+     the rail on their own. */
+  @media (prefers-reduced-motion: reduce) {
+    .rail-dot {
+      animation: none;
+      opacity: 0;
+    }
+  }
+
+  /*
+   * The gold field behind the hero's second line. A background-IMAGE rather
+   * than bg-af-accent, because only an image can be sized — and the wipe
+   * keyframe in @theme animates background-size. The gradient is flat, so it
+   * reads as the solid field it was; at rest the size is already 100%, which is
+   * the state it falls back to when the animation is suppressed.
+   */
+  .band-wipe {
+    background-image: linear-gradient(var(--af-accent), var(--af-accent));
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 100% 100%;
+  }
+
+  /*
+   * A rule that draws itself in from the left when its section is revealed.
+   * <Reveal> stamps data-shown on its wrapper; the descendant selector is what
+   * carries the state down to here, so the rule needs no JS of its own and no
+   * Tailwind data-variant. Scale is transform-only, so it animates on the
+   * compositor. Falls back to fully drawn wherever the transition is suppressed,
+   * which is the correct end state either way.
+   */
+  .rule-draw {
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-shown="true"] .rule-draw {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rule-draw,
+    [data-shown="true"] .rule-draw {
+      transform: scaleX(1);
+      transition: none;
+    }
+  }
+}
+
+/*
+ * Entrance animations are a progressive enhancement, never a gate on
+ * visibility. Every one of them starts at opacity 0 and fills `both`, so
+ * suppressing the animation has to leave the element in its natural, VISIBLE
+ * state — which `animation: none` does, and which a `0%`-opacity declaration
+ * here would not.
+ *
+ * Declared outside every @layer on purpose: .animate-rise and .animate-band are
+ * Tailwind-generated utilities, and an unlayered rule is the only thing that
+ * reliably outranks one regardless of the order Tailwind emits them in.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-band {
+    animation: none;
   }
 }
