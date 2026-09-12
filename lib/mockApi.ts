@@ -480,8 +480,8 @@ async function saveStore(s: Store) {
 }
 
 /** Deep-ish clone via JSON so React sees a fresh snapshot. */
-function snapshot(s: Store): Store {
-  return JSON.parse(JSON.stringify(s)) as Store;
+function snapshot<T>(s: T): T {
+  return JSON.parse(JSON.stringify(s)) as T;
 }
 
 // ---------------------------------------------------------------------------
