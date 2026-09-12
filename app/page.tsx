@@ -436,7 +436,7 @@ export default function HomePage() {
                   </span>
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-af-muted">
-                  Free while we're in pilot. Everything below is included.
+                  Free while we&apos;re in pilot. Everything below is included.
                 </p>
                 <ul className="mt-9 space-y-3.5">
                   {[

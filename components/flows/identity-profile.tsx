@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Fingerprint, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { Fingerprint, Lock, ScanFace, ShieldCheck, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -116,6 +116,22 @@ export function IdentityProfile() {
             <DetailRow label="National ID (NIN)">
               <span className="font-mono tracking-[0.14em]">{maskNin(id.nin)}</span>
             </DetailRow>
+            <DetailRow label="Biometric">
+              {id.biometric ? (
+                <span className="inline-flex items-center gap-1.5">
+                  {id.biometric === "fingerprint" ? (
+                    <Fingerprint className="h-3.5 w-3.5 text-brand-400" aria-hidden="true" />
+                  ) : (
+                    <ScanFace className="h-3.5 w-3.5 text-brand-400" aria-hidden="true" />
+                  )}
+                  {id.biometric === "fingerprint" ? "Fingerprint" : "Face"}
+                </span>
+              ) : (
+                /* Absence, so it is muted and says so plainly rather than
+                   showing a dash that could read as a rendering bug. */
+                <span className="font-normal text-muted-foreground">Not enrolled</span>
+              )}
+            </DetailRow>
             <DetailRow label="KYC status">
               <Badge variant={verified ? "success" : "muted"}>
                 {verified ? "Document-verified" : "Self-asserted"}
@@ -128,8 +144,9 @@ export function IdentityProfile() {
 
       {/* The thesis of the whole product, stated as an absence. */}
       <AbsenceNote icon={Lock} title="This is everything that exists.">
-        Three fields built this record : nothing else is stored. Businesses only ever see a signed
-        YES / NO to the facts you grant, never this page.
+        Three fields built this record, plus the record of a biometric enrollment if you made one :
+        nothing else is stored, and never the print or the image itself. Businesses only ever see a
+        signed YES / NO to the facts you grant, never this page.
       </AbsenceNote>
 
       <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">

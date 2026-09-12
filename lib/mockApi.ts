@@ -23,6 +23,7 @@ import {
 } from "@/lib/vault";
 import type {
   AccessLogEntry,
+  BiometricKind,
   Business,
   CheckAnswer,
   CheckId,
@@ -107,8 +108,24 @@ async function signReceipt(
   }
 }
 
+/**
+ * Which biometric a seeded holder enrolled.
+ *
+ * Derived from position rather than drawn at random, so the same record shows
+ * the same thing on every reseed — a demo where Adaeze's biometric changes each
+ * time you reset is a demo that looks broken. Every fourth record has none, so
+ * "not enrolled" exists in the seeded data and not only in records you create.
+ */
+function seedBiometric(index: number): BiometricKind | null {
+  if (index % 4 === 3) return null;
+  return index % 2 === 0 ? "fingerprint" : "face";
+}
+
 async function freshSeed(): Promise<Store> {
-  const identities = buildSeedIdentities();
+  const identities: Identity[] = buildSeedIdentities().map((u, i) => ({
+    ...u,
+    biometric: seedBiometric(i),
+  }));
   const demo = identities.find((i) => i.uniqueId === DEMO_IDENTITY_REFERENCE) ?? identities[0];
   const activeBusinessId = "biz_safebank";
 
@@ -207,7 +224,7 @@ async function freshSeed(): Promise<Store> {
 
       const roll = rng();
       const scopes: CheckId[] = ["over_18", "name_matches", "nin_matches", "has_verified_identity"].filter(
-        (_, i) => rng() > 0.5
+        () => rng() > 0.5
       ) as CheckId[];
       if (scopes.length === 0) scopes.push("over_18");
 
@@ -375,6 +392,17 @@ function normalizeStore(s: Store): Store {
     signature: v.signature ?? null,
     keyId: v.keyId ?? null,
   }));
+  // Records written before the biometric step existed have no value for it. The
+  // seeded holders get the biometric today's seed would give them — matched by
+  // id, never by position, because an enrolled record is appended after the
+  // seeded ones and a positional guess would invent an enrollment. Anything not
+  // in the seed stays null: claiming a biometric nobody gave is the one mistake
+  // this field must not make.
+  const seeded = new Map(buildSeedIdentities().map((u, i) => [u.id, seedBiometric(i)]));
+  s.identities = s.identities.map((i) => ({
+    ...i,
+    biometric: i.biometric ?? seeded.get(i.id) ?? null,
+  }));
   return s;
 }
 
@@ -486,6 +514,7 @@ export async function enrollIdentityApi(input: EnrollInput): Promise<{ store: St
     dob: input.dob,
     nin: input.nin.replace(/\D/g, "").slice(0, 11),
     kycStatus: "self_asserted",
+    biometric: input.biometric,
     createdAt: nowIso(),
   };
   store.identities.push(identity);

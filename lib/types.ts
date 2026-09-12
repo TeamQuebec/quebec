@@ -6,6 +6,9 @@
 /** Whether the record passed an independent (document / NIN) verification step. */
 export type KycStatus = "verified" | "self_asserted";
 
+/** Which biometric a holder bound to their record at enrollment. */
+export type BiometricKind = "fingerprint" | "face";
+
 export interface Identity {
   /** internal id, e.g. "id_adaeze" */
   id: string;
@@ -17,6 +20,14 @@ export interface Identity {
   /** 11-digit National ID number (synthetic — never a real NIN) */
   nin: string;
   kycStatus: KycStatus;
+  /**
+   * The biometric enrolled alongside this record, or null if the holder skipped
+   * it. Only WHICH one was enrolled is stored — never the print and never the
+   * image. That is the whole gesture: the record holds the fact that a finger or
+   * a face was bound to this reference, so a check can attest to it, while the
+   * biometric itself never enters the database and so can never leak from it.
+   */
+  biometric: BiometricKind | null;
   createdAt: string;
 }
 
@@ -103,6 +114,8 @@ export interface EnrollInput {
   name: string;
   dob: string;
   nin: string;
+  /** null when the holder skipped the biometric step — it is offered, not required */
+  biometric: BiometricKind | null;
 }
 
 export interface VerifyInput {

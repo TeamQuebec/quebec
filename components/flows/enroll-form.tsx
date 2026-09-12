@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
@@ -9,9 +9,11 @@ import {
   Fingerprint,
   Loader2,
   PartyPopper,
+  ScanFace,
   ShieldCheck,
   Sparkles,
   UserRound,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -25,9 +27,20 @@ import { useApp } from "@/state/app-context";
 import { SYNTHETIC_USERS } from "@/lib/mockData/users";
 import { computeAge, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { Identity } from "@/lib/types";
+import type { BiometricKind, Identity } from "@/lib/types";
 
 type Field = "name" | "dob" | "nin";
+
+/** The two enrollment options, and what each one would ask of you for real. */
+const BIOMETRICS: { kind: BiometricKind; icon: LucideIcon; label: string; hint: string }[] = [
+  { kind: "fingerprint", icon: Fingerprint, label: "Fingerprint", hint: "Touch sensor · three presses" },
+  { kind: "face", icon: ScanFace, label: "Face", hint: "Front camera · one look" },
+];
+
+const BIOMETRIC_LABEL: Record<BiometricKind, string> = {
+  fingerprint: "Fingerprint",
+  face: "Face",
+};
 
 /** Format-level validation, run inline as the user types/blurs. */
 function validateField(field: Field, value: string): string | undefined {
@@ -80,9 +93,22 @@ export function EnrollForm() {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [nin, setNin] = useState("");
+  const [biometric, setBiometric] = useState<BiometricKind | null>(null);
+  const [capturing, setCapturing] = useState<BiometricKind | null>(null);
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [identity, setIdentity] = useState<Identity | null>(null);
+
+  // The capture is a timer, so it has to be cancellable — submitting mid-capture
+  // swaps this form out for the success screen, and a stray tick would then land
+  // on a component that is no longer mounted.
+  const captureTimer = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (captureTimer.current !== null) window.clearTimeout(captureTimer.current);
+    },
+    []
+  );
 
   // Inline validation : an error only appears after the field is touched, then
   // updates live as the user fixes it. Nothing waits for submit.
@@ -97,11 +123,35 @@ export function EnrollForm() {
 
   const markTouched = (field: Field) => setTouched((prev) => ({ ...prev, [field]: true }));
 
+  /**
+   * Simulated capture. Nothing is read from a sensor and nothing is kept : the
+   * pause is here because the real gesture has one, and a biometric that
+   * enrolled instantly would teach the wrong thing about what it costs.
+   */
+  const capture = (kind: BiometricKind) => {
+    if (capturing) return;
+    setCapturing(kind);
+    captureTimer.current = window.setTimeout(() => {
+      captureTimer.current = null;
+      setBiometric(kind);
+      setCapturing(null);
+      toast.success(`${BIOMETRIC_LABEL[kind]} captured`, {
+        description: "Demo only : no sensor was read and no biometric data was stored.",
+      });
+    }, 900);
+  };
+
+  const clearBiometric = () => {
+    if (capturing) return;
+    setBiometric(null);
+  };
+
   const fillDemo = () => {
     const u = SYNTHETIC_USERS[Math.floor(Math.random() * SYNTHETIC_USERS.length)];
     setName(u.name);
     setDob(u.dob);
     setNin(u.nin);
+    setBiometric(Math.random() < 0.5 ? "fingerprint" : "face");
     setTouched({ name: true, dob: true, nin: true });
     toast("Demo identity loaded", {
       description: "A synthetic record has been filled in : you can edit it or submit as-is.",
@@ -117,7 +167,12 @@ export function EnrollForm() {
     }
     setSubmitting(true);
     try {
-      const id = await enroll({ name: name.trim(), dob, nin: nin.replace(/\D/g, "").slice(0, 11) });
+      const id = await enroll({
+        name: name.trim(),
+        dob,
+        nin: nin.replace(/\D/g, "").slice(0, 11),
+        biometric,
+      });
       setIdentity(id);
       toast.success(`Welcome, ${name.trim().split(" ")[0]}`, {
         description: "Your Quebec reference is ready to share.",
@@ -202,6 +257,13 @@ export function EnrollForm() {
                 <Fingerprint className="h-3.5 w-3.5 text-brand-400" />
                 Hand this reference to any business that needs to verify you.
               </p>
+              {identity.biometric && (
+                <p className="flex items-center gap-1.5">
+                  <ScanFace className="h-3.5 w-3.5 text-brand-400" />
+                  {BIOMETRIC_LABEL[identity.biometric]} enrolled. The print itself was never
+                  captured or stored.
+                </p>
+              )}
               <p className="flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-brand-400" />
                 You can see : and revoke : every check they run, anytime.
@@ -244,8 +306,8 @@ export function EnrollForm() {
                 Enroll your identity
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Three fields : that&apos;s all we need. Your record stays private: encrypted,
-                and never shown raw to verifiers.
+                Three fields, and a biometric if you want one. Your record stays private:
+                encrypted, and never shown raw to verifiers.
               </p>
             </div>
             <Button type="button" variant="ghost" size="sm" className="shrink-0" onClick={fillDemo}>
@@ -351,6 +413,95 @@ export function EnrollForm() {
                 <p className="text-xs text-muted-foreground">
                   11-digit format only.{" "}
                   <span className="italic">This demo does not check against the real registry.</span>
+                </p>
+              )}
+            </div>
+
+            {/* Biometric. Optional, and the reason is on the card: Quebec keeps
+                the enrollment, not the print. A field that says "optional" and
+                then explains what it does not collect is the honest version of
+                asking for a fingerprint. */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                {/* Not a <Label> : this names a group of two controls, not one
+                    field, so it is a span the group points at. Label would have
+                    rendered a <label> bound to nothing. */}
+                <span
+                  id="biometric-label"
+                  className="flex items-center gap-1.5 text-sm font-medium leading-none text-brand-900"
+                >
+                  <ScanFace className="h-3.5 w-3.5 text-brand-400" />
+                  Biometric
+                </span>
+                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Optional
+                </span>
+              </div>
+
+              <div
+                className="grid gap-2.5 sm:grid-cols-2"
+                role="group"
+                aria-labelledby="biometric-label"
+              >
+                {BIOMETRICS.map((b) => {
+                  const Icon = b.icon;
+                  const enrolled = biometric === b.kind;
+                  const busy = capturing === b.kind;
+                  return (
+                    <button
+                      key={b.kind}
+                      type="button"
+                      onClick={() => capture(b.kind)}
+                      aria-pressed={enrolled}
+                      disabled={capturing !== null}
+                      className={cn(
+                        "flex items-start gap-3 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
+                        // Enrolled is a state, so it is ink — the same rule the
+                        // checkable facts follow on the verifier's side.
+                        enrolled
+                          ? "border-brand-800 bg-brand-50 shadow-sm"
+                          : "border-border bg-white hover:border-brand-200 hover:bg-brand-50/40",
+                        capturing !== null && !busy && "opacity-50"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border",
+                          enrolled ? "border-brand-800 bg-white text-brand-900" : "border-border text-brand-400"
+                        )}
+                      >
+                        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
+                      </span>
+                      <span className="min-w-0">
+                        <span className={cn("flex items-center gap-1.5 text-sm font-semibold", enrolled ? "text-brand-950" : "text-brand-900")}>
+                          {b.label}
+                          {enrolled && <Check className="h-3.5 w-3.5 text-verify" />}
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                          {busy ? "Capturing…" : enrolled ? "Enrolled · demo capture" : b.hint}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {biometric ? (
+                <p className="flex items-center gap-1.5 text-xs text-verify-strong">
+                  <Check className="h-3 w-3" />
+                  {BIOMETRIC_LABEL[biometric]} enrolled.{" "}
+                  <button
+                    type="button"
+                    onClick={clearBiometric}
+                    className="font-medium text-brand-700 underline underline-offset-2 hover:text-brand-950"
+                  >
+                    Remove
+                  </button>
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Bind a fingerprint or a face to this reference : your record then carries proof
+                  that one was enrolled. Skip it and the record still works.
                 </p>
               )}
             </div>
